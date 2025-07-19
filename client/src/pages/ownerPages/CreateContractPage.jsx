@@ -95,30 +95,32 @@ const CreateContractPage = () => {
   }, [dispatch, formData, handleModalClose]);
 
   return (
-    <main className="flex flex-row mb-8 md:mb-0">
-      <div className="mt-10 flex flex-col items-center md:ml-14 md:items-start">
-        <div className="mb-6">
-          <h3 className="font-heading font-bold">Create Contract</h3>
-          <p className="text-gray-400 -mt-2 font-robotoNormal">
-            Fill in the form below to create a contract
-          </p>
+    <main className="flex flex-col items-center justify-center min-h-[90vh] bg-slate-100 py-8">
+      <div className="w-full max-w-3xl flex flex-col md:flex-row bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+        {/* Illustration (right on desktop, top on mobile) */}
+        <div className="hidden md:flex flex-col justify-center items-center bg-[#223981] p-8 w-1/2">
+          <img src={contractImage} alt="Contract Illustration" className="w-64 h-64 object-contain" />
         </div>
-        <div className="mb-4 flex items-center">
-          <h5 className="font-semibold">Real Estate Title: </h5>
-          <h5 className="ml-2">{title}</h5>
-        </div>
-        <div className="">
+        <div className="flex-1 flex flex-col justify-center p-8">
+          <div className="mb-6 text-center">
+            <h1 className="text-3xl md:text-4xl font-extrabold mb-2" style={{ color: '#223981', letterSpacing: 1 }}>Create Contract</h1>
+            <p className="text-gray-500 text-sm">Fill in the form below to create a contract</p>
+          </div>
+          <div className="mb-4 flex items-center justify-center gap-2">
+            <h5 className="font-semibold">Real Estate Title:</h5>
+            <h5 className="ml-2 text-[#223981] font-bold">{title}</h5>
+          </div>
           <form id="form" onSubmit={handleConfirmation}>
-            <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
               <TextField
                 select
                 required
                 label="Tenant User"
                 value={contractForm.tenant}
                 onChange={handleChange}
-                sx={{ width: "300px" }}
+                sx={{ width: "100%" }}
                 name="tenant"
-                color="tertiary"
+                color="primary"
               >
                 {contacts?.map((user) => (
                   <MenuItem key={user._id} value={user._id} className="">
@@ -137,16 +139,15 @@ const CreateContractPage = () => {
                   [setDate]
                 )}
               />
-
               <TextField
                 select
                 required
                 label="Payment Plan"
                 value={contractForm.paymentPlan}
                 onChange={handleChange}
-                sx={{ width: "300px" }}
+                sx={{ width: "100%" }}
                 name="paymentPlan"
-                color="tertiary"
+                color="primary"
               >
                 {paymentPlans.map((option, index) => (
                   <MenuItem key={index} value={option} className="">
@@ -154,41 +155,37 @@ const CreateContractPage = () => {
                   </MenuItem>
                 ))}
               </TextField>
-
               <TextField
                 label="Rent Amount"
                 value={contractForm.rentAmount}
                 name="rentAmount"
-                color="tertiary"
-                sx={{ width: "300px" }}
+                color="primary"
+                sx={{ width: "100%" }}
                 disabled
               />
             </div>
-            <div className="text-center mt-4 mb-6">
+            <div className="text-center mt-6 mb-2">
               <Button
-                disabled={
-                  isProcessing || (alertFlag && alertType === "success")
-                }
+                disabled={isProcessing || (alertFlag && alertType === "success")}
                 type="submit"
                 variant="contained"
                 size="large"
-                color="primary"
                 sx={{
-                  color: "white",
-                  "&:hover": {
-                    backgroundColor: "primary.dark",
-                    opacity: [0.9, 0.8, 0.7],
+                  backgroundColor: '#223981',
+                  color: 'white',
+                  borderRadius: 8,
+                  fontWeight: 600,
+                  fontSize: '1.1rem',
+                  py: 1.5,
+                  px: 6,
+                  '&:hover': {
+                    backgroundColor: '#1a2a5c',
                   },
                 }}
                 startIcon={<BorderColorRoundedIcon />}
               >
                 {isProcessing ? (
-                  <CircularProgress
-                    size={26}
-                    sx={{
-                      color: "#fff",
-                    }}
-                  />
+                  <CircularProgress size={26} sx={{ color: "#fff" }} />
                 ) : (
                   "Create"
                 )}
@@ -196,42 +193,16 @@ const CreateContractPage = () => {
             </div>
           </form>
         </div>
-
-        <div>
-          <ConfirmModal open={open} handleModalClose={handleModalClose}>
-            <h3 className="text-center">Confirm Contract?</h3>
-            <p className="text-center my-4">
-              Are you sure you want to create this contract? Once the contract
-              is created, you will not be able to edit it. You can only delete
-              it. The tenant will be notified of the contract creation.
-            </p>
-            <div className="flex flex-wrap justify-center gap-8 mt-8">
-              <Button onClick={handleModalClose} color="error">
-                Close
-              </Button>
-
-              <Button
-                onClick={handleCreateContract}
-                color="success"
-                variant="contained"
-              >
-                Confirm
-              </Button>
-            </div>
-          </ConfirmModal>
+      </div>
+      <AlertToast alertFlag={alertFlag} alertMsg={alertMsg} alertType={alertType} handleClose={handleAlertClose} />
+      <ConfirmModal open={open} handleModalClose={handleModalClose}>
+        <h3 className="text-center">Confirm Contract?</h3>
+        <p className="text-center my-4">Are you sure you want to create this contract? Once the contract is created, you will not be able to edit it. You can only delete it. The tenant will be notified of the contract creation.</p>
+        <div className="flex flex-wrap justify-center gap-8 mt-8">
+          <Button onClick={handleModalClose} color="error">Close</Button>
+          <Button onClick={handleCreateContract} color="success" variant="contained">Confirm</Button>
         </div>
-      </div>
-
-      <div className="hidden md:block mx-auto mt-10 mb-6 md:mb-0">
-        <img src={contractImage} alt="" />
-      </div>
-
-      <AlertToast
-        alertFlag={alertFlag}
-        alertMsg={alertMsg}
-        alertType={alertType}
-        handleClose={handleAlertClose}
-      />
+      </ConfirmModal>
     </main>
   );
 };

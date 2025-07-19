@@ -1,11 +1,31 @@
 import express from "express";
 const router = express.Router();
+
+import {
+  sendMessage,
+  getMessages,
+  getChats,
+  createChat
+} from "../controllers/chatController.js";
+
 import {
   authorizeOwnerUser,
   authorizeTenantUser,
 } from "../middleware/userAuthorization.js";
 
-import { sendMessage, getMessages, getChats } from "../controllers/chatController.js";
+// Middleware to allow both owner and tenant
+const authorizeUser = (req, res, next) => {
+  authorizeOwnerUser(req, res, (err) => {
+    if (!err && req.user) return next();
+    authorizeTenantUser(req, res, next);
+  });
+};
+
+/**
+ * @description Create or get existing chat between users
+ * @route POST /api/chat
+ */
+router.post("/", authorizeUser, createChat);
 
 /**
  * @description send message route for owner user

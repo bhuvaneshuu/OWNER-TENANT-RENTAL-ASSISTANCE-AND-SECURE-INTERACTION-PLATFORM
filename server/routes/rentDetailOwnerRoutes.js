@@ -3,7 +3,7 @@ const router = express.Router();
 import {
   createRentDetail,
   getAllRentDetailsOwnerView,
-  getSingleRentDetailsOwnerView,
+  getSingleRentDetailOwnerView,
   createPaymentHistory,
   getAllPaymentHistory,
 } from "../controllers/rentDetailOwnerControllers.js";
@@ -13,7 +13,6 @@ import {
  * @route POST /api/rentDetail/createDetail
  */
 router.post("/createDetail", createRentDetail);
-
 /**
  * @description Get all the Rent Details for owner user
  * @route GET /api/rentDetail/allRentDetails
@@ -24,7 +23,7 @@ router.get("/allRentDetails", getAllRentDetailsOwnerView);
  * @description Get Single Rent Detail for owner user
  * @route GET /api/rentDetail/:rentDetailId
  */
-router.get("/:rentDetailId", getSingleRentDetailsOwnerView);
+router.get("/:rentDetailId", getSingleRentDetailOwnerView);
 
 /**
  * @description Create rent payment detail history

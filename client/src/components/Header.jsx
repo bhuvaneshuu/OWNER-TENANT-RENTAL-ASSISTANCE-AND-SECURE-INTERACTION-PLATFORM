@@ -1,190 +1,104 @@
 import { useCallback, useState } from "react";
 import { Logo, NavBarLinksOwner, NavBarLinksTenant } from "../components";
-import { logOut } from "../features/auth/authSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { logOut } from "../features/auth/authSlice";
 import { Link } from "react-router-dom";
-import {
-  Button,
-  Box,
-  Avatar,
-  Menu,
-  MenuItem,
-  ListItemIcon,
-  Divider,
-  IconButton,
-  Tooltip,
-} from "@mui/material";
-
+import { Button, Avatar, Menu, MenuItem, IconButton } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import CloseIcon from "@mui/icons-material/Close";
-import Logout from "@mui/icons-material/Logout";
 
 const Header = () => {
   const { userType, user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-
-  const [menuOpen, setOpen] = useState(false);
-
-  const toggleMenu = useCallback(() => {
-    setOpen((prev) => !prev);
-  }, []);
-
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
-  const open = Boolean(anchorEl);
+  const menuOpen = Boolean(anchorEl);
 
-  const handleClick = useCallback((event) => {
-    setAnchorEl(event.currentTarget);
-  }, []);
-
-  const handleClose = useCallback(() => {
-    setAnchorEl(null);
-  }, []);
-
-  const logOutUser = useCallback(() => {
+  const toggleDrawer = useCallback(() => setDrawerOpen((prev) => !prev), []);
+  const handleAvatarClick = (event) => setAnchorEl(event.currentTarget);
+  const handleMenuClose = () => setAnchorEl(null);
+  const handleLogout = () => {
     dispatch(logOut());
-  }, [dispatch]);
+    handleMenuClose();
+  };
 
   return (
-    <>
-      {menuOpen && (
-        <section className="modal-container bg-[rgb(0,0,0,0.7)] fixed inset-0 outline-none overflow-x-hidden overflow-y-auto z-10 lg:hidden">
-          <div className="modal-dialog relative w-11/12 h-5/6 mx-auto mt-10 pointer-events-none">
-            <div className="modal-content border-none shadow-lg relative w-full h-full pointer-events-auto bg-white bg-clip-padding rounded-md outline-none text-current">
-              <div className="modal-header flex flex-col flex-shrink-0  items-start p-4 border-b border-gray-200 rounded-t-md">
-                <CloseIcon
-                  fontSize="large"
-                  color="error"
-                  onClick={toggleMenu}
-                  sx={{
-                    cursor: "pointer",
-                    "&:hover": {
-                      color: "#FF0000",
-                    },
-                  }}
-                />
-                <div className="mx-auto">
-                  <Logo />
-                </div>
-              </div>
-              <div className="modal-body relative p-4 flex flex-col h-3/4 gap-5">
-                {userType === "owner" ? (
-                  <NavBarLinksOwner toggleMenu={toggleMenu} />
-                ) : (
-                  <NavBarLinksTenant toggleMenu={toggleMenu} />
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-      <header className="flex m-1 shadow-sm justify-center items-center">
-        <div className="flex flex-col justify-center ml-2 mr-auto">
-          <Logo />
+    <header className="w-full flex items-center justify-between px-6 py-3 bg-[#0a1633] shadow-md sticky top-0 z-20">
+      {/* Left: Logo, System Name, and Subtitle */}
+      <div className="flex items-center gap-3">
+        <Logo />
+        <div className="flex flex-col ml-2">
+          <span className="text-2xl font-extrabold tracking-tight text-white">
+            Owner-Tenant System
+          </span>
+          <span className="text-sm font-medium text-white">
+            Effortless property handling for owners & tenants
+          </span>
         </div>
-
-        <nav className="hidden justify-evenly items-center w-1/3 lg:flex">
+      </div>
+      {/* Right: Nav Links, Profile Picture, Hamburger */}
+      <div className="flex items-center gap-4">
+        {/* Nav links (hidden on mobile) */}
+        <nav className="hidden lg:flex gap-6">
           {userType === "owner" ? (
-            <NavBarLinksOwner toggleMenu={toggleMenu} />
+            <NavBarLinksOwner
+              toggleMenu={() => {}}
+              linkClassName="text-white font-medium hover:text-blue-300 transition px-2 py-1"
+            />
           ) : (
-            <NavBarLinksTenant toggleMenu={toggleMenu} />
+            <NavBarLinksTenant
+              toggleMenu={() => {}}
+              linkClassName="text-white font-medium hover:text-blue-300 transition px-2 py-1"
+            />
           )}
         </nav>
-        <Tooltip title="Menu">
-          <div className="mr-1 lg:hidden">
-            <Button
-              variant="text"
-              size="small"
-              sx={{
-                color: "black",
-                "&:hover": {
-                  color: "primary.dark",
-                },
-              }}
-              onClick={toggleMenu}
-            >
-              <MenuIcon />
-            </Button>
-          </div>
-        </Tooltip>
-
-        <Box
-          sx={{
-            mr: 2,
-          }}
+        {/* Hamburger menu for mobile only */}
+        <IconButton
+          className="block lg:hidden"
+          onClick={toggleDrawer}
+          sx={{ color: "white", display: { lg: "none", xs: "block" } }}
         >
-          <Tooltip title="Account settings">
-            <IconButton
-              onClick={handleClick}
-              size="small"
-              sx={{ ml: 2 }}
-              aria-controls={open ? "account-menu" : undefined}
-              aria-haspopup="true"
-              aria-expanded={open ? "true" : undefined}
-            >
-              <Avatar
-                alt={(user?.firstName).toUpperCase()}
-                src={user?.profileImage}
-              />
-            </IconButton>
-          </Tooltip>
-        </Box>
+          <MenuIcon />
+        </IconButton>
+        {/* Profile Picture with dropdown */}
+        <IconButton onClick={handleAvatarClick} sx={{ p: 0 }}>
+          <Avatar
+            alt={user?.firstName?.toUpperCase()}
+            src={user?.profileImage}
+            sx={{ width: 40, height: 40, border: "2px solid #fff" }}
+          />
+        </IconButton>
         <Menu
           anchorEl={anchorEl}
-          id="account-menu"
-          open={open}
-          onClose={handleClose}
-          onClick={handleClose}
-          PaperProps={{
-            elevation: 0,
-            sx: {
-              width: 150,
-              overflow: "visible",
-              filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-              mt: 1.5,
-              "& .MuiAvatar-root": {
-                width: 32,
-                height: 32,
-                ml: -0.5,
-                mr: 1,
-              },
-              "&:before": {
-                content: '""',
-                display: "block",
-                position: "absolute",
-                top: 0,
-                right: 14,
-                width: 10,
-                height: 10,
-                bgcolor: "background.paper",
-                transform: "translateY(-50%) rotate(45deg)",
-                zIndex: 0,
-              },
-            },
-          }}
-          transformOrigin={{ horizontal: "right", vertical: "top" }}
-          anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+          open={menuOpen}
+          onClose={handleMenuClose}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+          transformOrigin={{ vertical: "top", horizontal: "right" }}
         >
-          <Link to={`/${userType}/profile`}>
-            <MenuItem>
-              <Avatar
-                alt={(user?.firstName).toUpperCase()}
-                src={user?.profileImage}
-              />
-              Profile
-            </MenuItem>
-          </Link>
-
-          <Divider />
-
-          <MenuItem onClick={logOutUser}>
-            <ListItemIcon>
-              <Logout fontSize="small" />
-            </ListItemIcon>
-            Logout
+          <MenuItem component={Link} to={`/${userType}/profile`} onClick={handleMenuClose}>
+            Profile
           </MenuItem>
+          <MenuItem onClick={handleLogout}>Log out</MenuItem>
         </Menu>
-      </header>
-    </>
+      </div>
+      {/* Drawer for mobile nav (only show if open) */}
+      {drawerOpen && (
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-60 flex justify-end lg:hidden" onClick={toggleDrawer}>
+          <div className="bg-[#0a1633] h-full w-64 p-6 flex flex-col gap-4" onClick={e => e.stopPropagation()}>
+            {userType === "owner" ? (
+              <NavBarLinksOwner
+                toggleMenu={toggleDrawer}
+                linkClassName="text-white font-medium hover:text-blue-300 transition px-2 py-1"
+              />
+            ) : (
+              <NavBarLinksTenant
+                toggleMenu={toggleDrawer}
+                linkClassName="text-white font-medium hover:text-blue-300 transition px-2 py-1"
+              />
+            )}
+          </div>
+        </div>
+      )}
+    </header>
   );
 };
 

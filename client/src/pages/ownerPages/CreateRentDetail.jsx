@@ -24,80 +24,72 @@ const CreateRentDetail = () => {
 
   const { allContracts, isLoading } = useSelector((state) => state.ownerUser);
 
-  // get all real estate
-  useEffect(() => {
-    dispatch(getOwnerAllContracts());
-  }, [dispatch]);
-
   const [contractForm, setContractFrom] = useState({
     tenant: "",
     realEstate: "",
     rentAmount: "",
     paymentPlan: "",
     startDate: "",
+    endDate: "",
     tenantName: "",
   });
 
-  // handle change in the form
-  const handleChange = useCallback(
-    (e) => {
-      setContractFrom({ ...contractForm, [e.target.name]: e.target.value });
-    },
-    [contractForm]
-  );
+  useEffect(() => {
+    dispatch(getOwnerAllContracts());
+  }, [dispatch]);
 
-  // set rent amount to the price of the property when the property is selected
   useEffect(() => {
     if (contractForm.realEstate) {
-      setContractFrom({
-        ...contractForm,
-        tenant: allContracts?.find(
-          (contract) => contract.realEstate._id === contractForm.realEstate
-        ).tenant._id,
-        rentAmount: allContracts?.find(
-          (contract) => contract.realEstate._id === contractForm.realEstate
-        ).rentAmount,
-        startDate: allContracts?.find(
-          (contract) => contract.realEstate._id === contractForm.realEstate
-        ).startDate,
-        paymentPlan: allContracts?.find(
-          (contract) => contract.realEstate._id === contractForm.realEstate
-        ).paymentPlan,
-        tenantName: allContracts
-          ?.find(
-            (contract) => contract.realEstate._id === contractForm.realEstate
-          )
-          .tenant.firstName.concat(
-            " ",
-            allContracts?.find(
-              (contract) => contract.realEstate._id === contractForm.realEstate
-            ).tenant.lastName
-          ),
-      });
-    }
-  }, [contractForm.realEstate, allContracts, setContractFrom, contractForm]);
+      const selectedContract = allContracts?.find(
+        (contract) => contract.realEstate._id === contractForm.realEstate
+      );
 
-  // Redirect to all rent details page
+      if (
+        selectedContract?.tenant?._id &&
+        /^[a-f\d]{24}$/i.test(selectedContract.tenant._id)
+      ) {
+        setContractFrom((prev) => ({
+          ...prev,
+          tenant: selectedContract.tenant._id,
+          rentAmount: selectedContract.rentAmount,
+          startDate: selectedContract.startDate,
+          paymentPlan: selectedContract.paymentPlan,
+          endDate: calculateAddedDate(
+            selectedContract.paymentPlan,
+            selectedContract.startDate
+          ),
+          tenantName: `${selectedContract.tenant.firstName} ${selectedContract.tenant.lastName}`,
+        }));
+      } else {
+        setContractFrom((prev) => ({
+          ...prev,
+          tenant: "",
+          tenantName: "Invalid tenant",
+        }));
+      }
+    }
+  }, [contractForm.realEstate, allContracts]);
+
   useEffect(() => {
     if (success) {
       const timer = setTimeout(() => {
-        navigate(`/owner/rentDetail`);
+        navigate("/owner/rentDetail");
       }, 1500);
       return () => clearTimeout(timer);
     }
   }, [success, navigate]);
 
-  const handleAlertClose = useCallback(
-    (event, reason) => {
-      if (reason === "clickaway") {
-        return;
-      }
-      dispatch(clearAlert());
+  const handleChange = useCallback(
+    (e) => {
+      setContractFrom((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     },
-    [dispatch]
+    []
   );
 
-  //modal
+  const handleAlertClose = useCallback((event, reason) => {
+    if (reason !== "clickaway") dispatch(clearAlert());
+  }, [dispatch]);
+
   const [open, setOpen] = useState(false);
   const handleModalOpen = useCallback(() => setOpen(true), []);
   const handleModalClose = useCallback(() => setOpen(false), []);
@@ -105,127 +97,157 @@ const CreateRentDetail = () => {
   const [formData, setFormData] = useState({});
   const handleConfirmation = (e) => {
     e.preventDefault();
-    const { tenant, realEstate, paymentPlan, startDate } = contractForm;
+
+    if (!contractForm.tenant || !/^[a-f\d]{24}$/i.test(contractForm.tenant)) {
+      alert("Invalid tenant ID. Please reselect a valid contract.");
+      return;
+    }
+
+    if (!contractForm.endDate) {
+      alert("Please enter a valid end date.");
+      return;
+    }
+
     setFormData({
-      tenant,
-      realEstate,
-      paymentPlan,
-      startDate,
-      currentRentDate: {
-        from: startDate,
-        to: calculateAddedDate(paymentPlan, startDate),
-      },
+      tenant: contractForm.tenant,
+      realEstate: contractForm.realEstate,
+      monthlyRent: contractForm.rentAmount,
+      paymentPlan: contractForm.paymentPlan,
+      contractTerms: "Rent is payable on or before the 5th of every month.",
+      status: "Pending",
+      startDate: contractForm.startDate,
+      endDate: contractForm.endDate,
     });
 
     handleModalOpen();
   };
-
+  
   const handleCreateRentDetail = useCallback(() => {
-    dispatch(createRentDetail({ formData }));
+    const finalEndDate = contractForm.endDate || calculateAddedDate(contractForm.paymentPlan, contractForm.startDate);
+  
+    const finalFormData = {
+      tenant: contractForm.tenant,
+      realEstate: contractForm.realEstate,
+      monthlyRent: contractForm.rentAmount,
+      paymentPlan: contractForm.paymentPlan,
+      contractTerms: "Rent is payable on or before the 5th of every month.",
+      status: "Pending",
+      startDate: contractForm.startDate,
+      endDate: finalEndDate,
+    };
+  
+    dispatch(createRentDetail(finalFormData));
     handleModalClose();
-  }, [dispatch, formData, handleModalClose]);
-
-  if (isLoading) return <PageLoading />;
-
+  }, [dispatch, contractForm, handleModalClose]);
+  
   return (
-    <main className="flex flex-col md:flex-row">
-      <div className="mt-10 flex flex-col items-center md:ml-16 md:items-start">
-        <div className="mb-6">
-          <h3 className="font-heading font-bold">Create Rent Detail</h3>
-          <p className="text-gray-400 -mt-2 font-robotoNormal">
-            Fill in the form below to create the rent detail
-          </p>
+    <main className="flex flex-col items-center justify-center min-h-[90vh] bg-slate-100 py-8">
+      <div className="w-full max-w-3xl flex flex-col md:flex-row bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+        {/* Illustration (right on desktop, top on mobile) */}
+        <div className="hidden md:flex flex-col justify-center items-center bg-[#223981] p-8 w-1/2">
+          <img src={createRentImage} alt="Rent Illustration" className="w-64 h-64 object-contain" />
         </div>
-
-        <div className="">
-          <form id="form" onSubmit={handleConfirmation}>
-            <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-              <div className="mb-4">
-                <h5 className="text-gray-700 mb-3">
-                  <HomeWorkRoundedIcon /> Select Your Real Estate
+        <div className="flex-1 flex flex-col justify-center p-8">
+          <div className="mb-6 text-center">
+            <h1 className="text-3xl md:text-4xl font-extrabold mb-2" style={{ color: '#223981', letterSpacing: 1 }}>Create Rent Detail</h1>
+            <p className="text-gray-500 text-sm">Fill in the form below to create the rent detail</p>
+          </div>
+          <form onSubmit={handleConfirmation}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+              <div>
+                <h5 className="text-gray-700 mb-3 font-semibold flex items-center gap-1">
+                  <HomeWorkRoundedIcon fontSize="small" /> Select Your Eligible Real Estate
                 </h5>
                 <TextField
                   select
                   required
-                  label="Real Estate"
+                  label="Eligible Real Estate"
                   value={contractForm.realEstate}
                   onChange={handleChange}
-                  sx={{ width: "300px" }}
+                  sx={{ width: "100%" }}
                   name="realEstate"
-                  color="tertiary"
+                  color="primary"
                 >
                   {allContracts?.map((contract) => (
-                    <MenuItem
-                      key={contract._id}
-                      value={contract.realEstate._id}
-                      className=""
-                    >
+                    <MenuItem key={contract._id} value={contract.realEstate._id}>
                       {contract.realEstate.title}
                     </MenuItem>
                   ))}
                 </TextField>
               </div>
-              <div className="flex flex-col items-center md:items-start">
-                <h5 className="text-gray-700 mb-3">
-                  <InfoRoundedIcon /> Contract Details
+              <div>
+                <h5 className="text-gray-700 mb-3 font-semibold flex items-center gap-1">
+                  <InfoRoundedIcon fontSize="small" /> Contract Details
                 </h5>
-                <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+                <div className="flex flex-col gap-4">
                   <TextField
                     label="Tenant"
                     value={contractForm.tenantName}
-                    color="tertiary"
-                    sx={{ width: "300px" }}
+                    color="primary"
+                    sx={{ width: "100%" }}
+                    disabled
                   />
-
                   <TextField
                     label="Contract Start Date"
                     value={contractForm.startDate}
                     name="startDate"
-                    color="tertiary"
-                    sx={{ width: "300px" }}
+                    color="primary"
+                    sx={{ width: "100%" }}
+                    InputLabelProps={{ shrink: true }}
+                    disabled
                   />
-
                   <TextField
                     label="Payment Plan"
                     value={contractForm.paymentPlan}
                     name="paymentPlan"
-                    color="tertiary"
-                    sx={{ width: "300px" }}
+                    color="primary"
+                    sx={{ width: "100%" }}
+                    InputLabelProps={{ shrink: true }}
+                    disabled
                   />
-
                   <TextField
                     label="Rent Amount"
                     value={contractForm.rentAmount}
                     name="rentAmount"
-                    color="tertiary"
-                    sx={{ width: "300px" }}
+                    color="primary"
+                    sx={{ width: "100%" }}
+                    InputLabelProps={{ shrink: true }}
+                    disabled
+                  />
+                  <TextField
+                    label="End Date"
+                    value={contractForm.endDate}
+                    name="endDate"
+                    color="primary"
+                    sx={{ width: "100%" }}
+                    InputLabelProps={{ shrink: true }}
+                    disabled
                   />
                 </div>
               </div>
             </div>
-            <div className="text-center mt-4 mb-6">
+            <div className="text-center mt-6 mb-2">
               <Button
                 disabled={isProcessing}
                 type="submit"
                 variant="contained"
                 size="large"
-                color="primary"
                 sx={{
-                  color: "white",
-                  "&:hover": {
-                    backgroundColor: "primary.dark",
-                    opacity: [0.9, 0.8, 0.7],
+                  backgroundColor: '#223981',
+                  color: 'white',
+                  borderRadius: 8,
+                  fontWeight: 600,
+                  fontSize: '1.1rem',
+                  py: 1.5,
+                  px: 6,
+                  '&:hover': {
+                    backgroundColor: '#1a2a5c',
                   },
                 }}
                 startIcon={<BorderColorRoundedIcon />}
               >
                 {isProcessing ? (
-                  <CircularProgress
-                    size={26}
-                    sx={{
-                      color: "#fff",
-                    }}
-                  />
+                  <CircularProgress size={26} sx={{ color: "#fff" }} />
                 ) : (
                   "Create"
                 )}
@@ -233,42 +255,16 @@ const CreateRentDetail = () => {
             </div>
           </form>
         </div>
-
-        <div>
-          <ConfirmModal open={open} handleModalClose={handleModalClose}>
-            <h3 className="text-center">Create Rent Detail</h3>
-            <p className="text-center my-4">
-              Are you sure you want to create this rent detail? You won't be
-              able to undo this action. The rent detail can only be deleted by
-              the owner when the contract is terminated.
-            </p>
-            <div className="flex flex-wrap justify-center gap-8 mt-8">
-              <Button onClick={handleModalClose} color="error">
-                Close
-              </Button>
-
-              <Button
-                onClick={handleCreateRentDetail}
-                color="success"
-                variant="contained"
-              >
-                Confirm
-              </Button>
-            </div>
-          </ConfirmModal>
+      </div>
+      <AlertToast alertFlag={alertFlag} alertMsg={alertMsg} alertType={alertType} handleClose={handleAlertClose} />
+      <ConfirmModal open={open} handleModalClose={handleModalClose}>
+        <h3 className="text-center">Create Rent Detail</h3>
+        <p className="text-center my-4">Are you sure you want to create this rent detail? You won't be able to undo this action.</p>
+        <div className="flex flex-wrap justify-center gap-8 mt-8">
+          <Button onClick={handleModalClose} color="error">Close</Button>
+          <Button onClick={handleCreateRentDetail} color="success" variant="contained">Confirm</Button>
         </div>
-      </div>
-
-      <div className="mt-10 mb-6 md:mb-0 mx-14 self-center">
-        <img src={createRentImage} alt="" />
-      </div>
-
-      <AlertToast
-        alertFlag={alertFlag}
-        alertMsg={alertMsg}
-        alertType={alertType}
-        handleClose={handleAlertClose}
-      />
+      </ConfirmModal>
     </main>
   );
 };

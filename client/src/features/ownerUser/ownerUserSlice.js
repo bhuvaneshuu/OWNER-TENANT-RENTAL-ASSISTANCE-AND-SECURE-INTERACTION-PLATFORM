@@ -110,7 +110,9 @@ export const getOwnerAllContracts = createAsyncThunk(
   "getOwnerAllContracts",
   async (arg, thunkAPI) => {
     try {
-      const { data } = await axiosFetch.get("/contract/owner/allContracts");
+      const { data } = await axiosFetch.get(
+        "/contract/owner/contracts-without-rent"
+      );
       return await data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data.msg);
@@ -300,7 +302,7 @@ const ownerUserSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(getOwnerAllContracts.fulfilled, (state, action) => {
-        state.allContracts = action.payload.allContracts;
+        state.allContracts = action.payload.contractsWithoutRentDetails;
         state.isLoading = false;
         state.alertFlag = false;
       })

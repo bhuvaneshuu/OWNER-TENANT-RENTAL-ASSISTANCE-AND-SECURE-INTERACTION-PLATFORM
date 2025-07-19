@@ -1,5 +1,6 @@
 import express from "express";
 const router = express.Router();
+
 import {
   createContract,
   getContractDetailTenantView,
@@ -9,11 +10,14 @@ import {
   getOwnerAllContracts,
   getAllTenantRentalProperties,
   getTenantContractDetail,
+  getOwnerContractsWithoutRentDetails, // ✅ newly added import
 } from "../controllers/contractControllers.js";
+
 import {
   authorizeOwnerUser,
   authorizeTenantUser,
 } from "../middleware/userAuthorization.js";
+
 /**
  * @description Create a contract
  * @route POST /api/contract
@@ -78,4 +82,15 @@ router.get(
   getTenantContractDetail
 );
 
+/**
+ * @description Get owner's contracts without rent details (for dropdown in rent details form)
+ * @route GET /api/contract/owner/contracts-without-rent
+ */
+router.get(
+  "/owner/contracts-without-rent",
+  authorizeOwnerUser,
+  getOwnerContractsWithoutRentDetails
+);
+
 export default router;
+

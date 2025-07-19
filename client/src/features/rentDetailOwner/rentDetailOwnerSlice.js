@@ -3,13 +3,13 @@ import axiosFetch from "../../utils/axiosCreate";
 
 export const createRentDetail = createAsyncThunk(
   "createRentDetail",
-  async ({ formData }, thunkAPI) => {
+  async (formData, thunkAPI) => {
     try {
       const { data } = await axiosFetch.post(
         "/rentDetail/createDetail",
         formData
       );
-      return await data;
+      return data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data.msg);
     }
@@ -29,13 +29,19 @@ export const getAllRentDetailsOwnerView = createAsyncThunk(
 );
 
 export const getSingleRentDetailOwnerView = createAsyncThunk(
-  "getSingleRentDetailOwnerView",
+  "rentDetailOwner/getSingleRentDetailOwnerView",
   async ({ rentDetailId }, thunkAPI) => {
+    if (!rentDetailId) {
+      return thunkAPI.rejectWithValue("Invalid rentDetailId provided.");
+    }
+
     try {
-      const { data } = await axiosFetch.get(`/rentDetail/${rentDetailId}`);
-      return await data;
+      const response = await axiosFetch.get(`/rentDetail/${rentDetailId}`);
+      return response.data; // ✅ Do not use `await` here again
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data.msg);
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.msg || "Failed to fetch rent detail"
+      );
     }
   }
 );

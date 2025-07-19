@@ -7,6 +7,7 @@ import PaymentHistory from "../models/PaymentHistory.js";
 
 import { NotFoundError, BadRequestError } from "../request-errors/index.js";
 import { sendEmail } from "../utils/emailSender.js";
+import mongoose from "mongoose";
 
 /**
  * @description Create Contract
@@ -17,7 +18,6 @@ const createContract = async (req, res) => {
   const { tenant, realEstate } = req.body;
   req.body.owner = req.user.userId;
 
-  //check if contract already exists for this tenant and real estate
   const contractExists = await Contract.findOne({
     owner: req.user.userId,
     tenant,
@@ -27,7 +27,6 @@ const createContract = async (req, res) => {
     throw new BadRequestError("Contract already exists");
   }
 
-  //check if contract already exists for this real estate
   const contractForRealEstate = await Contract.findOne({
     realEstate,
   });
@@ -36,7 +35,6 @@ const createContract = async (req, res) => {
   }
 
   const ownerUser = await OwnerUser.findById(req.user.userId);
-
   const tenantUser = await TenantUser.findById(tenant);
   if (!tenantUser) {
     throw new NotFoundError("Tenant user not found");
@@ -48,6 +46,7 @@ const createContract = async (req, res) => {
   }
 
   const contract = await Contract.create(req.body);
+
   const to = tenantUser.email;
   const from = ownerUser.email;
   const subject = `Contract created for rental of property titled ${realEstateUser.title}`;
@@ -62,10 +61,8 @@ const createContract = async (req, res) => {
     <p>Best regards,</p>
     <p>${ownerUser.firstName} ${ownerUser.lastName}</p>`;
 
-  //send email to tenant user to approve the contract
   await sendEmail(to, from, subject, body);
 
-  //change the status of the real estate to false
   realEstateUser.status = false;
   await realEstateUser.save();
 
@@ -75,7 +72,6 @@ const createContract = async (req, res) => {
 /**
  * @description Get contract details for tenant user
  * @route GET /api/contract/tenantView/:contractId
- * @returns {object} 200 - An object containing the contract details
  */
 const getContractDetailTenantView = async (req, res) => {
   const contractDetail = await Contract.findOne({
@@ -92,7 +88,7 @@ const getContractDetailTenantView = async (req, res) => {
     })
     .populate({
       path: "tenant",
-      select: "firstName lastName",
+      select: "firstName lastName email phoneNumber",
     });
 
   if (!contractDetail) {
@@ -105,7 +101,6 @@ const getContractDetailTenantView = async (req, res) => {
 /**
  * @description Approve contract
  * @route PATCH /api/contract/approve/:contractId
- * @returns {object} 200 - An object containing the contract details
  */
 const approveContract = async (req, res) => {
   const contractDetail = await Contract.findOne({
@@ -140,13 +135,10 @@ const approveContract = async (req, res) => {
     <p>Thank you for your assistance.</p>
     <br><br>
     <p>Best Regards,</p>
-    <p>${contractDetail.tenant.firstName} ${contractDetail.tenant.lastName}</p>
-    `;
+    <p>${contractDetail.tenant.firstName} ${contractDetail.tenant.lastName}</p>`;
 
-  //send email to owner user to approve the contract
   await sendEmail(to, from, subject, body);
 
-  //change the status of the contract to true
   contractDetail.status = "Active";
   await contractDetail.save();
 
@@ -156,7 +148,6 @@ const approveContract = async (req, res) => {
 /**
  * @description Get contract details for owner user
  * @route GET /api/contract/ownerView/:realEstateId
- * @returns {object} 200 - An object containing the contract details
  */
 const getContractDetailOwnerView = async (req, res) => {
   const contractDetail = await Contract.findOne({
@@ -173,7 +164,7 @@ const getContractDetailOwnerView = async (req, res) => {
     })
     .populate({
       path: "owner",
-      select: "firstName lastName",
+      select: "firstName lastName email phoneNumber",
     });
 
   if (!contractDetail) {
@@ -185,8 +176,7 @@ const getContractDetailOwnerView = async (req, res) => {
 
 /**
  * @description Delete contract
- * @route GET /api/contract/ownerView/:realEstateId
- * @returns
+ * @route DELETE /api/contract/delete/:contractId
  */
 const deleteContract = async (req, res) => {
   const contract = await Contract.findOneAndDelete({
@@ -203,11 +193,9 @@ const deleteContract = async (req, res) => {
     throw new NotFoundError("Real Estate Not Found");
   }
 
-  //change the status of the real estate to true
   realEstate.status = true;
   await realEstate.save();
 
-  //delete the rent detail of the contract from the rent detail collection
   const rentDetail = await RentDetail.findOneAndDelete({
     realEstate: contract.realEstate,
     tenant: contract.tenant,
@@ -215,15 +203,11 @@ const deleteContract = async (req, res) => {
   });
 
   if (rentDetail) {
-    //delete the payment history of the contract from the payment history collection using the rent detail id
     await PaymentHistory.deleteMany({
       rentDetail: rentDetail._id,
     });
   }
 
-  //send email to tenant user that contract has been deleted
-
-  // get the tenant user and owner user details to send email
   const tenantUser = await TenantUser.findById(contract.tenant);
   if (!tenantUser) {
     throw new NotFoundError("Tenant user not found");
@@ -231,7 +215,6 @@ const deleteContract = async (req, res) => {
 
   const ownerUser = await OwnerUser.findById(req.user.userId);
 
-  //email details
   const to = tenantUser.email;
   const from = ownerUser.email;
   const subject = `Contract terminated of property titled ${realEstate.title}`;
@@ -249,7 +232,6 @@ const deleteContract = async (req, res) => {
     <p>Best regards,</p>
     <p>${ownerUser.firstName} ${ownerUser.lastName}</p>`;
 
-  //send email to tenant user that contract has been deleted
   await sendEmail(to, from, subject, body);
 
   res.json({ message: "Contract terminated successfully", success: true });
@@ -258,12 +240,10 @@ const deleteContract = async (req, res) => {
 /**
  * @description Get All Owner's Contracts
  * @route GET /api/contract/owner/allContracts
- * @returns
  */
 const getOwnerAllContracts = async (req, res) => {
   const allContracts = await Contract.find({
     owner: req.user.userId,
-    status: "Active",
   })
     .populate({
       path: "realEstate",
@@ -273,19 +253,17 @@ const getOwnerAllContracts = async (req, res) => {
       path: "tenant",
       select: "_id firstName lastName",
     });
-
+    
   res.json({ allContracts });
 };
 
 /**
  * @description Get the active rental properties of the tenant user
  * @route GET /api/contract/tenantUser/allRentalProperties
- * @returns property details
  */
 const getAllTenantRentalProperties = async (req, res) => {
   const allRentalProperties = await Contract.find({
-    tenant: req.user.userId,
-    status: "Active",
+    tenant: mongoose.Types.ObjectId(req.user.userId),
   }).populate({
     path: "realEstate",
     select: "title address category slug realEstateImages price",
@@ -302,13 +280,12 @@ const getAllTenantRentalProperties = async (req, res) => {
 /**
  * @description Get the contract details for the tenant user using the real estate id
  * @route GET /api/contract/tenant/:realEstateId
- * @returns {object} 200 - An object containing the contract details
  */
 const getTenantContractDetail = async (req, res) => {
   const contractDetail = await Contract.findOne({
-    realEstate: req.params.realEstateId,
-    tenant: req.user.userId,
-    status: "Active",
+    realEstate: mongoose.Types.ObjectId(req.params.realEstateId),
+    tenant: mongoose.Types.ObjectId(req.user.userId),
+    // status: "Active", // if you want to filter by status
   })
     .populate({
       path: "realEstate",
@@ -330,6 +307,26 @@ const getTenantContractDetail = async (req, res) => {
   res.json({ contractDetail });
 };
 
+/**
+ * @description Get contracts without rent detail for owner
+ * @route GET /api/contract/owner/contracts-without-rent
+ */
+const getOwnerContractsWithoutRentDetails = async (req, res) => {
+  const contractsWithoutRentDetails = await Contract.find({
+    owner: req.user.userId,
+  })
+  .populate({
+    path: "realEstate",
+    select: "title _id",
+  })
+  .populate({
+    path: "tenant",
+    select: "_id firstName lastName",
+  });
+
+  res.json({ contractsWithoutRentDetails });
+};
+
 export {
   createContract,
   getContractDetailTenantView,
@@ -339,4 +336,6 @@ export {
   getOwnerAllContracts,
   getAllTenantRentalProperties,
   getTenantContractDetail,
+  getOwnerContractsWithoutRentDetails,
 };
+

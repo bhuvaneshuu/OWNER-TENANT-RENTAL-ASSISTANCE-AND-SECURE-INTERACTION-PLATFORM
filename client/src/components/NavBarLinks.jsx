@@ -11,9 +11,9 @@ const NavBarLinksOwner = ({ toggleMenu }) => {
         <Button
           type="text"
           sx={{
-            color: "black",
+            color: "white",
             "&:hover": {
-              color: "primary.dark",
+              color: "gray",
             },
             width: "100%",
           }}
@@ -29,9 +29,9 @@ const NavBarLinksOwner = ({ toggleMenu }) => {
         <Button
           type="text"
           sx={{
-            color: "black",
+            color: "white",
             "&:hover": {
-              color: "primary.dark",
+              color: "gray",
             },
             width: "100%",
           }}
@@ -47,9 +47,9 @@ const NavBarLinksOwner = ({ toggleMenu }) => {
         <Button
           type="text"
           sx={{
-            color: "black",
+            color: "white",
             "&:hover": {
-              color: "primary.dark",
+              color: "gray",
             },
             width: "100%",
           }}
@@ -61,9 +61,9 @@ const NavBarLinksOwner = ({ toggleMenu }) => {
         <Button
           type="text"
           sx={{
-            color: "black",
+            color: "white",
             "&:hover": {
-              color: "primary.dark",
+              color: "gray",
             },
             width: "100%",
           }}
@@ -79,9 +79,9 @@ const NavBarLinksOwner = ({ toggleMenu }) => {
         <Button
           type="text"
           sx={{
-            color: "black",
+            color: "white",
             "&:hover": {
-              color: "primary.dark",
+              color: "gray",
             },
             width: "100%",
             position: "relative",
@@ -107,9 +107,9 @@ const NavBarLinksTenant = ({ toggleMenu }) => {
         <Button
           type="text"
           sx={{
-            color: "black",
+            color: "white",
             "&:hover": {
-              color: "primary.dark",
+              color: "gray",
             },
             width: "100%",
           }}
@@ -125,9 +125,9 @@ const NavBarLinksTenant = ({ toggleMenu }) => {
         <Button
           type="text"
           sx={{
-            color: "black",
+            color: "white",
             "&:hover": {
-              color: "primary.dark",
+              color: "gray",
             },
             width: "100%",
           }}
@@ -143,9 +143,9 @@ const NavBarLinksTenant = ({ toggleMenu }) => {
         <Button
           type="text"
           sx={{
-            color: "black",
+            color: "white",
             "&:hover": {
-              color: "primary.dark",
+              color: "gray",
             },
             width: "100%",
           }}
@@ -161,9 +161,9 @@ const NavBarLinksTenant = ({ toggleMenu }) => {
         <Button
           type="text"
           sx={{
-            color: "black",
+            color: "white",
             "&:hover": {
-              color: "primary.dark",
+              color: "gray",
             },
             width: "100%",
           }}
@@ -179,9 +179,9 @@ const NavBarLinksTenant = ({ toggleMenu }) => {
         <Button
           type="text"
           sx={{
-            color: "black",
+            color: "white",
             "&:hover": {
-              color: "primary.dark",
+              color: "gray",
             },
             width: "100%",
             position: "relative",

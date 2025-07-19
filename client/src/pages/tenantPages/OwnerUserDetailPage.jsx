@@ -21,6 +21,7 @@ import ContactPageRoundedIcon from "@mui/icons-material/ContactPageRounded";
 import PersonRemoveAlt1RoundedIcon from "@mui/icons-material/PersonRemoveAlt1Rounded";
 import CircularProgress from "@mui/material/CircularProgress";
 import MessageIcon from '@mui/icons-material/Message';
+import axiosFetch from "../../utils/axiosCreate";
 
 const OwnerUserDetailPage = () => {
   const dispatch = useDispatch();
@@ -167,21 +168,21 @@ const OwnerUserDetailPage = () => {
           )}
 
           <div className="flex">
-
             <Button variant="contained" size="small" sx={{
               color: "white",
               width: "100%",
             }}
               startIcon={<MessageIcon />}
-              onClick={() => navigate(`/tenant/chat`, {
-                state: {
-                  _id: user._id,
-                  firstName: user.firstName,
-                  lastName: user.lastName,
-                  profileImage: user.profileImage,
-                  slug: user.slug
+              onClick={async () => {
+                try {
+                  // 1. Create or get chat
+                  const { data } = await axiosFetch.post("/chat", { userId: user._id });
+                  // 2. Navigate to chat page with chat object (no initial message)
+                  navigate(`/tenant/chat`, { state: data });
+                } catch (err) {
+                  alert("Failed to start chat");
                 }
-              })}
+              }}
             >
               Chat
             </Button>

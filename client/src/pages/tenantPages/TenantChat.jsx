@@ -28,7 +28,18 @@ const TenantChat = () => {
   // set the current chat to location state if it exists
   useEffect(() => {
     if (location?.state) {
-      handleCurrentChatChange(location.state);
+      // If state is a chat object (has _id), use it directly
+      if (location.state._id) {
+        setCurrentChat(location.state);
+        setCurrentChatIndex(location.state._id);
+        socket?.emit("markAsRead", {
+          receiverID: user?._id,
+          senderId: location.state._id,
+        });
+        dispatch(markChatAsRead({ chatId: location.state._id }));
+      } else {
+        handleCurrentChatChange(location.state);
+      }
     }
   }, [location.state]);
 

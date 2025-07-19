@@ -43,6 +43,7 @@ import {
     SharedLayout,
     ProtectedRoutes,
     ScrollToTop,
+    ContactsCard,
 } from "./components";
 
 import { ThemeProvider, createTheme } from "@mui/material/styles";
@@ -154,7 +155,7 @@ function App() {
                             element={<RentDetailTenantPage />}
                         />
                         <Route path="send-complaint/:slug" element={<SendComplaint />} />
-                        <Route path="contacts/all" element={<AllContactsTenant />} />
+                        <Route path="contacts/all" element={<AllContactsTenant/>} />
                         <Route path="chat" element={<TenantChat />} />
                     </Route>
                     <Route path="/login/:role" element={<Login />} />

@@ -58,7 +58,7 @@ export const getAllContacts = createAsyncThunk(
       if (name) {
         url = url + `?name=${name}`;
       }
-      const { data } = await axiosFetch.get(url);
+      const { data } = await axiosFetch.get(url); // FIXED: use url variable
       return await data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data.msg);

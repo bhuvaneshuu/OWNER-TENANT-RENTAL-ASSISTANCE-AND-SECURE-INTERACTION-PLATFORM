@@ -16,6 +16,7 @@ import PersonRemoveAlt1RoundedIcon from "@mui/icons-material/PersonRemoveAlt1Rou
 import CircularProgress from "@mui/material/CircularProgress";
 import ImageViewer from "react-simple-image-viewer";
 import MessageIcon from "@mui/icons-material/Message";
+import axiosFetch from "../../utils/axiosCreate";
 
 const TenantUserDetailPage = () => {
   const dispatch = useDispatch();
@@ -168,17 +169,16 @@ const TenantUserDetailPage = () => {
                   width: "100%",
                 }}
                 startIcon={<MessageIcon />}
-                onClick={() =>
-                  navigate(`/owner/chat`, {
-                    state: {
-                      _id: user._id,
-                      firstName: user.firstName,
-                      lastName: user.lastName,
-                      profileImage: user.profileImage,
-                      slug: user.slug,
-                    },
-                  })
-                }
+                onClick={async () => {
+                  try {
+                    // 1. Create or get chat
+                    const { data } = await axiosFetch.post("/chat", { userId: user._id });
+                    // 2. Navigate to chat page with chat object (no initial message)
+                    navigate(`/owner/chat`, { state: data });
+                  } catch (err) {
+                    alert("Failed to start chat");
+                  }
+                }}
               >
                 Chat
               </Button>

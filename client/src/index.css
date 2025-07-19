@@ -5,10 +5,10 @@
 
 body {
   font-family: "Open Sans", Sans-Serif;
-  background: #f0f4f8;
+  background: hsl(257, 18%, 92%);
   font-weight: 400;
   line-height: 1.75;
-  color: #102a43;
+  color: #222a32;
 }
 h1,
 h2,

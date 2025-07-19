@@ -71,9 +71,11 @@ const AllContacts = () => {
                 <h3 className="text-center mt-8 mb-6">Contact not found</h3>
               ) : (
                 <>
-                  {contacts?.map((user) => {
-                    return <ContactsCard key={user._id} {...user} />;
-                  })}
+                  {contacts?.map((user, idx) => (
+                    <div key={user._id} className="bg-transparent rounded-2xl shadow-none p-0 m-0">
+                      <ContactsCard {...user} index={idx} />
+                    </div>
+                  ))}
                 </>
               )}
             </>

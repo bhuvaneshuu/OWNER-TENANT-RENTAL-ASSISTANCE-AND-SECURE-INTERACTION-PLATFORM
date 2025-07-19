@@ -103,78 +103,83 @@ const PostRealEstate = () => {
   }, [postSuccess, navigate, realEstate]);
 
   return (
-    <div>
-      <main className="px-6 h-full mt-10">
-        <div className="flex lg:justify-between justify-center flex-wrap h-full g-6">
-          <div className="lg:w-5/12 md:w-8/12 mb-12">
-            <form onSubmit={handleSubmit} id="form">
-              <div className="flex flex-col justify-center items-center mt-3 mb-4">
-                <h3 className="font-heading font-bold">Post your Property </h3>
-                <p className="text-gray-400 text-sm">
-                  Enter the details of your property
-                </p>
+    <div className="min-h-screen w-full bg-gradient-to-br from-slate-100 to-slate-200 flex flex-col justify-between">
+      <main className="flex flex-col items-center justify-center flex-1 py-8 px-2">
+        <div className="w-full max-w-5xl flex flex-col md:flex-row bg-white rounded-2xl shadow-2xl overflow-hidden">
+          {/* Illustration */}
+          <div className="hidden md:flex flex-col justify-center items-center bg-blue-900 p-8 w-1/2">
+            <img src={postRealEstateImg2} alt="Post Property" className="w-64 mb-6 drop-shadow-xl" />
+            <h2 className="text-white text-2xl font-bold mb-2 text-center">List Your Property</h2>
+            <p className="text-blue-100 text-center">Reach thousands of tenants by posting your property here!</p>
+          </div>
+          {/* Form Card */}
+          <div className="w-full md:w-1/2 p-8 flex flex-col justify-center">
+            <form onSubmit={handleSubmit} id="form" className="space-y-6">
+              <div className="mb-2">
+                <h3 className="text-2xl font-bold text-blue-900 mb-1">Post Your Property</h3>
+                <p className="text-gray-500 text-sm">Enter the details of your property below.</p>
               </div>
-              <div className="flex flex-wrap flex-col gap-2 ml-5">
-                <div className="flex flex-col gap-4 my-2">
-                  <h5 className="mb-1">
-                    <InfoIcon /> Initial Details
-                  </h5>
-                  <FormTextField
-                    label="Title"
-                    name="title"
-                    type={"text"}
-                    value={values.title}
-                    handleChange={handleChange}
-                    autoFocus={true}
-                  />
-                  <TextField
-                    label="Description"
-                    required
-                    multiline
-                    rows={4}
-                    color="tertiary"
-                    placeholder="Description of your property"
-                    name="description"
-                    value={values.description}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="flex flex-col gap-4 my-2">
-                  <h5 className="mb-1">
-                    <LocationOnIcon /> Address
-                  </h5>
-                  <FormTextField
-                    label="Street Name / Landmark"
-                    name="streetName"
-                    type={"text"}
-                    value={values.streetName}
-                    handleChange={handleChange}
-                  />
+              {/* Initial Details */}
+              <div className="space-y-3">
+                <h5 className="font-semibold text-blue-900 flex items-center gap-1"><InfoIcon fontSize="small" /> Initial Details</h5>
+                <FormTextField
+                  label="Title"
+                  name="title"
+                  type="text"
+                  value={values.title}
+                  handleChange={handleChange}
+                  autoFocus={true}
+                />
+                <TextField
+                  label="Description"
+                  required
+                  multiline
+                  rows={3}
+                  color="primary"
+                  placeholder="Description of your property"
+                  name="description"
+                  value={values.description}
+                  onChange={handleChange}
+                  className="bg-gray-50 rounded"
+                  fullWidth
+                />
+              </div>
+              {/* Address */}
+              <div className="space-y-3">
+                <h5 className="font-semibold text-blue-900 flex items-center gap-1"><LocationOnIcon fontSize="small" /> Address</h5>
+                <FormTextField
+                  label="Street Name / Landmark"
+                  name="streetName"
+                  type="text"
+                  value={values.streetName}
+                  handleChange={handleChange}
+                />
+                <div className="flex gap-2">
                   <FormTextField
                     label="City"
                     name="city"
-                    type={"text"}
+                    type="text"
                     value={values.city}
                     handleChange={handleChange}
                   />
                   <FormTextField
                     label="State"
                     name="state"
-                    type={"text"}
+                    type="text"
                     value={values.state}
                     handleChange={handleChange}
                   />
-
-                  <CountrySelectField
-                    value={values.country}
-                    setFormValues={setFormValues}
-                    handleChange={handleChange}
-                  />
                 </div>
-                <div className="flex flex-col gap-4 my-2">
-                  <h5 className="mb-1">
-                    <BungalowIcon /> Property Info
-                  </h5>
+                <CountrySelectField
+                  value={values.country}
+                  setFormValues={setFormValues}
+                  handleChange={handleChange}
+                />
+              </div>
+              {/* Property Info */}
+              <div className="space-y-3">
+                <h5 className="font-semibold text-blue-900 flex items-center gap-1"><BungalowIcon fontSize="small" /> Property Info</h5>
+                <div className="flex gap-2">
                   <TextField
                     label="Price"
                     name="price"
@@ -182,13 +187,15 @@ const PostRealEstate = () => {
                     placeholder="Rent per month"
                     required
                     value={values.price}
-                    color="tertiary"
+                    color="primary"
                     onChange={handleChange}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">{countryToCurrency[values.countryCode]}</InputAdornment>
                       ),
                     }}
+                    className="bg-gray-50 rounded flex-1"
+                    fullWidth
                   />
                   <FormSelectField
                     label="Category"
@@ -198,146 +205,71 @@ const PostRealEstate = () => {
                       "Apartment",
                       "Room",
                       "Shop Space",
-                      "Office Space",
                     ]}
                     value={values.category}
                     handleChange={handleChange}
                   />
-
-                  <TextField
-                    label="Area"
+                </div>
+                <div className="flex gap-2">
+                  <FormTextField
+                    label="Area (sq ft)"
                     name="area"
                     type="number"
-                    placeholder="Area of the property"
-                    required
                     value={values.area}
-                    color="tertiary"
-                    onChange={handleChange}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">sq. feet</InputAdornment>
-                      ),
-                    }}
+                    handleChange={handleChange}
                   />
-                  <TextField
+                  <FormTextField
                     label="Floors"
                     name="floors"
                     type="number"
-                    placeholder="Number of floors"
-                    required
                     value={values.floors}
-                    color="tertiary"
-                    onChange={handleChange}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">floors</InputAdornment>
-                      ),
-                    }}
+                    handleChange={handleChange}
                   />
                   <FormSelectField
-                    label="Property Facing"
+                    label="Facing"
                     name="facing"
-                    options={[
-                      "North",
-                      "South",
-                      "East",
-                      "West",
-                      "North-East",
-                      "North-West",
-                      "South-East",
-                      "South-West",
-                    ]}
+                    options={["East", "West", "North", "South"]}
                     value={values.facing}
                     handleChange={handleChange}
                   />
                 </div>
-                <div className="flex flex-col my-2">
-                  <h5>
-                    <PermMediaIcon /> Media
-                  </h5>
-                  <div className="flex flex-col justify-center pb-2">
-                    <label
-                      htmlFor="formFileMultiple"
-                      className="form-label inline-block mb-2 text-gray-500 cursor-pointer font-robotoNormal"
-                    >
-                      Upload Images of the Real Estate
-                    </label>
-
-                    <input
-                      required
-                      name="realEstateImages"
-                      className="form-control block font-robotoNormal w-full px-3 py-1.5 text-base font-normal border border-solid border-gray-300 rounded cursor-pointer focus:border-tertiary focus:outline-none"
-                      type="file"
-                      id="formFileMultiple"
-                      multiple
-                      onChange={handleImagesChange}
-                    />
-                    <p className="mt-1 text-xs text-gray-400">
-                      JPG, JPEG, PNG or GIF (MAX 3.5mb per)
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap self-center border mt-2">
-                    {previewImage()}
-                  </div>
-                </div>
               </div>
-
-              <div className="text-center mt-2">
+              {/* Images */}
+              <div className="space-y-3">
+                <h5 className="font-semibold text-blue-900 flex items-center gap-1"><PermMediaIcon fontSize="small" /> Property Images</h5>
+                <input
+                  type="file"
+                  name="images"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImagesChange}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+                <div className="flex flex-wrap gap-2">{previewImage()}</div>
+              </div>
+              {/* Submit Button */}
+              <div className="pt-2">
                 <Button
-                  disabled={isLoading || (alertFlag && alertType === "success")}
                   type="submit"
                   variant="contained"
-                  size="large"
-                  color="primary"
-                  sx={{
-                    color: "white",
-                    "&:hover": {
-                      backgroundColor: "primary.dark",
-                      opacity: [0.9, 0.8, 0.7],
-                    },
-                    width: "25%",
-                  }}
+                  fullWidth
+                  className="rounded-lg py-3 text-lg font-semibold shadow-md bg-blue-900 hover:bg-blue-800 text-white transition-colors"
+                  disabled={isLoading}
                 >
-                  {isLoading ? (
-                    <CircularProgress
-                      size={26}
-                      sx={{
-                        color: "#fff",
-                      }}
-                    />
-                  ) : (
-                    "Post"
-                  )}
+                  {isLoading ? <CircularProgress size={24} color="inherit" /> : "Post Property"}
                 </Button>
               </div>
+              {/* Alert Toast */}
+              <AlertToast
+                open={alertFlag}
+                handleClose={handleClose}
+                severity={alertType}
+                message={alertMsg}
+              />
             </form>
-          </div>
-          <div className="hidden grow-0 shrink-1 md:shrink-0 basis-auto w-5/12 mb-12 lg:block">
-            <img
-              src={postRealEstateImg}
-              className="w-full"
-              alt="Cartoon of a person holding a card"
-            />
-            <img
-              src={postRealEstateImg2}
-              className="w-full"
-              alt="Cartoon of a person holding a card"
-            />
-            <img
-              src={postRealEstateImg3}
-              className="w-full"
-              alt="Cartoon of a person holding a card"
-            />
           </div>
         </div>
       </main>
-
-      <AlertToast
-        alertFlag={alertFlag}
-        alertMsg={alertMsg}
-        alertType={alertType}
-        handleClose={handleClose}
-      />
     </div>
   );
 };

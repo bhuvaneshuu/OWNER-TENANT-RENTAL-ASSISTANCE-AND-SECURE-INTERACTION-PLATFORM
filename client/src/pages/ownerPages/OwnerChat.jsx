@@ -28,7 +28,18 @@ const OwnerChat = () => {
   // set the current chat to location state if it exists
   useEffect(() => {
     if (location?.state) {
-      handleCurrentChatChange(location.state);
+      // If state is a chat object (has _id), use it directly
+      if (location.state._id) {
+        setCurrentChat(location.state);
+        setCurrentChatIndex(location.state._id);
+        socket?.emit("markAsRead", {
+          receiverID: user?._id,
+          senderId: location.state._id,
+        });
+        dispatch(markChatAsRead({ chatId: location.state._id }));
+      } else {
+        handleCurrentChatChange(location.state);
+      }
     }
   }, [location.state]);
 
@@ -68,40 +79,42 @@ const OwnerChat = () => {
   }
 
   return (
-    <div className="flex flex-col flex-wrap justify-center gap-8 md:justify-start mt-12 px-6 md:mx-4">
-      <h3 className="font-heading font-bold">Chat</h3>
-      <div
-        className="flex gap-4"
-        style={{
-          maxHeight: "500px",
-        }}
-      >
-        <div className="flex flex-col gap-4 md:w-1/4 min-w-fit overflow-y-auto overflow-x-hidden">
-          {chats?.map((chat) => (
-            <div key={chat?._id} onClick={() => handleCurrentChatChange(chat)}>
+    <div className="flex flex-col items-center justify-center min-h-[90vh] bg-slate-100 py-8">
+      <div className="w-full max-w-5xl bg-white rounded-2xl shadow-2xl border border-slate-200 px-0 py-0 flex flex-col">
+        <div className="flex items-center justify-between px-8 py-6 border-b border-slate-200 rounded-t-2xl bg-[#223981]">
+          <h3 className="text-2xl font-extrabold text-white tracking-wide">Chat</h3>
+        </div>
+        <div className="flex flex-row gap-0 md:gap-4 p-4" style={{ minHeight: 500 }}>
+          {/* Chat user list */}
+          <div className="flex flex-col gap-2 w-1/3 min-w-[220px] max-w-xs bg-slate-50 rounded-xl p-2 shadow-md overflow-y-auto">
+            {chats?.map((chat) => (
               <div
-                className={`${
-                  currentSelectedChatIndex === chat?._id && "bg-slate-300"
-                } rounded-md`}
+                key={chat?._id}
+                onClick={() => handleCurrentChatChange(chat)}
+                className={`transition-all duration-150 rounded-lg cursor-pointer ${currentSelectedChatIndex === chat?._id ? 'bg-[#223981] text-white shadow-lg' : 'hover:bg-slate-200'}`}
+                style={{ border: currentSelectedChatIndex === chat?._id ? '2px solid #223981' : '2px solid transparent' }}
               >
                 <ChatUsers chat={chat} currentUser={user} />
               </div>
-            </div>
-          ))}
-        </div>
-        {currentChat === null ? (
-          <div className="flex justify-center items-center h-64 w-full">
-            <p className="font-display text-base md:text-xl lg:text-2xl text-center">
-              Click on a chat to start messaging
-            </p>
+            ))}
           </div>
-        ) : (
-            <ChatMessages
-              chat={currentChat}
-              currentUser={user}
-              handleCurrentChatChange={handleCurrentChatChange}
-            />
-        )}
+          {/* Chat messages area */}
+          <div className="flex-1 flex flex-col justify-between bg-slate-50 rounded-xl shadow-md p-4 ml-0 md:ml-4">
+            {currentChat === null ? (
+              <div className="flex justify-center items-center h-64 w-full">
+                <p className="font-display text-base md:text-xl lg:text-2xl text-center text-gray-400">
+                  Click on a chat to start messaging
+                </p>
+              </div>
+            ) : (
+              <ChatMessages
+                chat={currentChat}
+                currentUser={user}
+                handleCurrentChatChange={handleCurrentChatChange}
+              />
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
