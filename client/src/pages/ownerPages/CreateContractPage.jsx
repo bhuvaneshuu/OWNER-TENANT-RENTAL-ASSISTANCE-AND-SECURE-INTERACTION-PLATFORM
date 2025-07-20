@@ -95,30 +95,33 @@ const CreateContractPage = () => {
   }, [dispatch, formData, handleModalClose]);
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-[90vh] bg-slate-100 py-8">
-      <div className="w-full max-w-3xl flex flex-col md:flex-row bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
-        {/* Illustration (right on desktop, top on mobile) */}
-        <div className="hidden md:flex flex-col justify-center items-center bg-[#223981] p-8 w-1/2">
-          <img src={contractImage} alt="Contract Illustration" className="w-64 h-64 object-contain" />
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-white py-10 flex flex-col items-center justify-center">
+      <div className="w-full max-w-4xl flex flex-col md:flex-row bg-white/80 backdrop-blur-md rounded-3xl shadow-2xl border border-indigo-100 overflow-hidden animate-fadein-scale">
+        {/* Illustration (left on desktop, top on mobile) */}
+        <div className="flex flex-col justify-center items-center bg-gradient-to-br from-[#223981] via-blue-700 to-indigo-900 p-8 md:w-1/2 w-full">
+          <img src={contractImage} alt="Contract Illustration" className="w-64 h-64 object-contain drop-shadow-xl animate-fadein-delay" />
         </div>
-        <div className="flex-1 flex flex-col justify-center p-8">
-          <div className="mb-6 text-center">
-            <h1 className="text-3xl md:text-4xl font-extrabold mb-2" style={{ color: '#223981', letterSpacing: 1 }}>Create Contract</h1>
-            <p className="text-gray-500 text-sm">Fill in the form below to create a contract</p>
+        <div className="flex-1 flex flex-col justify-center p-8 gap-4">
+          <div className="mb-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-extrabold mb-2 tracking-wide drop-shadow-lg text-[#223981]">Create Contract</h1>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <span className="w-2 h-8 bg-gradient-to-b from-blue-400 to-indigo-400 rounded-full animate-accent-bar"></span>
+              <p className="text-gray-500 text-base font-medium">Fill in the form below to create a contract</p>
+            </div>
           </div>
           <div className="mb-4 flex items-center justify-center gap-2">
-            <h5 className="font-semibold">Real Estate Title:</h5>
+            <h5 className="font-semibold text-[#223981]">Real Estate Title:</h5>
             <h5 className="ml-2 text-[#223981] font-bold">{title}</h5>
           </div>
-          <form id="form" onSubmit={handleConfirmation}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+          <form id="form" onSubmit={handleConfirmation} className="flex flex-col gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <TextField
                 select
                 required
                 label="Tenant User"
                 value={contractForm.tenant}
                 onChange={handleChange}
-                sx={{ width: "100%" }}
+                sx={{ width: "100%", background: '#f8fafc', borderRadius: 2 }}
                 name="tenant"
                 color="primary"
               >
@@ -145,7 +148,7 @@ const CreateContractPage = () => {
                 label="Payment Plan"
                 value={contractForm.paymentPlan}
                 onChange={handleChange}
-                sx={{ width: "100%" }}
+                sx={{ width: "100%", background: '#f8fafc', borderRadius: 2 }}
                 name="paymentPlan"
                 color="primary"
               >
@@ -160,7 +163,7 @@ const CreateContractPage = () => {
                 value={contractForm.rentAmount}
                 name="rentAmount"
                 color="primary"
-                sx={{ width: "100%" }}
+                sx={{ width: "100%", background: '#f8fafc', borderRadius: 2 }}
                 disabled
               />
             </div>
@@ -171,15 +174,18 @@ const CreateContractPage = () => {
                 variant="contained"
                 size="large"
                 sx={{
-                  backgroundColor: '#223981',
+                  background: 'linear-gradient(90deg, #223981 0%, #3b82f6 100%)',
                   color: 'white',
                   borderRadius: 8,
-                  fontWeight: 600,
-                  fontSize: '1.1rem',
-                  py: 1.5,
-                  px: 6,
+                  fontWeight: 700,
+                  fontSize: '1.2rem',
+                  py: 1.7,
+                  px: 8,
+                  letterSpacing: 1,
+                  boxShadow: 4,
+                  textTransform: 'uppercase',
                   '&:hover': {
-                    backgroundColor: '#1a2a5c',
+                    background: 'linear-gradient(90deg, #1a2a5c 0%, #2563eb 100%)',
                   },
                 }}
                 startIcon={<BorderColorRoundedIcon />}

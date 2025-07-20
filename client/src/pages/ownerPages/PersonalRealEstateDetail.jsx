@@ -88,55 +88,70 @@ const PersonalRealEstateDetail = () => {
 
   return (
     <>
-      <main className="mb-12 mt-10 mx-4 md:mx-12">
-        <div className="flex flex-col gap-4 mx-auto">
-          <h3 className="font-heading font-bold">Rental Property Detail</h3>
-          <section className="flex flex-col gap-12 rounded-md md:flex-row">
-            <div className="w-full md:w-2/3">
-              <ImageCarousal realEstateImages={realEstate?.realEstateImages} />
+      <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-white pb-10">
+        {/* Full-width Hero Image with overlay */}
+        <div className="relative w-full">
+          <div className="h-[340px] md:h-[440px] w-full overflow-hidden">
+            <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/60 via-black/30 to-transparent" />
+            <ImageCarousal realEstateImages={realEstate?.realEstateImages} />
+          </div>
+          {/* Overlayed Title, Price, Address */}
+          <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center z-20 pointer-events-none">
+            <h1 className="text-white text-3xl md:text-5xl font-extrabold drop-shadow-lg mb-2 animate-fadein-delay">{realEstate?.title}</h1>
+            <div className="flex items-center gap-2 mb-2 animate-fadein-delay">
+              <LocationOnOutlinedIcon sx={{ color: '#fff', fontSize: 28 }} />
+              <span className="text-white text-lg md:text-2xl font-semibold drop-shadow">{realEstate?.address?.streetName}, {realEstate?.address?.city}, {realEstate?.address?.state}, {realEstate?.address?.country}</span>
             </div>
-            <div className="flex flex-col rounded-md gap-4">
-              <div className="flex flex-col gap-2">
-                <h3 className="font-semibold">{realEstate?.title}</h3>
-                <div>
-                  <p className="font-roboto text-gray-500">
-                    {realEstate?.category}
-                  </p>
+            <span className="text-white text-2xl md:text-4xl font-bold bg-black/40 px-6 py-2 rounded-2xl shadow-lg animate-shadow-pulse">
+              {countryToCurrency[currentCountry.code]} {format(realEstate?.price)}
+            </span>
+          </div>
+        </div>
+        {/* Main Info Card: category, posted date, stats, description, and actions */}
+        <div className="max-w-5xl mx-auto mt-12">
+          <div className="bg-white rounded-3xl shadow-xl p-8 flex flex-col gap-6 animate-fadein-scale">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="flex flex-col gap-1">
+                <span className="text-indigo-700 font-bold text-lg flex items-center gap-2">
+                  <ExploreRoundedIcon sx={{ color: '#29b46e' }} /> {realEstate?.category}
+                </span>
+                <span className="text-gray-500 text-sm">Posted on: {dateFormatter(realEstate?.createdAt)}</span>
+                <span className="text-gray-400 text-xs">Id: {realEstate?.propertyId}</span>
+              </div>
+              <div className="flex flex-wrap gap-6 mt-2 md:mt-0">
+                <div className="flex items-center gap-2">
+                  <SquareFootRoundedIcon sx={{ color: '#738FA7' }} />
+                  <span className="font-semibold text-[#223981]">{format(realEstate?.area)} sq. feet</span>
                 </div>
-                <p className="-ml-1 text-base tracking-tight">
-                  <LocationOnOutlinedIcon sx={{ color: "#019149" }} />
-                  {realEstate?.address?.streetName}, {" "}
-                  {realEstate?.address?.city},{" "}
-                  {realEstate?.address?.state}, {" "}
-                  {realEstate?.address?.country}
+                <div className="flex items-center gap-2">
+                  <HorizontalSplitRoundedIcon />
+                  <span className="font-semibold text-[#223981]">{format(realEstate?.floors)} {realEstate?.floors > 1 ? 'floors' : 'floor'}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <ExploreRoundedIcon sx={{ color: '#29b46e' }} />
+                  <span className="font-semibold text-[#223981]">{realEstate?.facing}</span>
+                </div>
+              </div>
+            </div>
+            {/* Description */}
+            <div className="flex items-start gap-4 mt-2">
+              <ArticleIcon sx={{ color: '#223981', fontSize: 32 }} />
+              <div>
+                <h3 className="font-semibold text-xl text-[#223981] mb-2">Description</h3>
+                <p className="text-lg text-[#475569] tracking-normal">
+                  {realEstate?.description}
                 </p>
-                <div className="">
-                  <p className="font-robotoNormal text-xs font-semibold tracking-tight">
-                    Posted on: {dateFormatter(realEstate?.createdAt)}
-                  </p>
-                  <p className="font-robotoNormal text-xs tracking-tight">
-                    Id: {realEstate?.propertyId}
-                  </p>
-                </div>
               </div>
-              <div className="">
-                <div className="rounded-md">
-                  <p className="font-roboto text-primaryDark leading-4 ">
-                    RENT per month
-                  </p>
-                  <span className="font-semibold text-lg text-primaryDark">
-                    {countryToCurrency[currentCountry.code]} {format(realEstate?.price)}
-                  </span>
-                </div>
-              </div>
-              {/* Render the edit and create contract if the real estate property is available for rental */}
+            </div>
+            {/* Action Buttons at the bottom of the card */}
+            <div className="flex flex-wrap gap-4 mt-6 items-center justify-center">
               {realEstate?.status === true ? (
-                <div className="flex flex-wrap gap-4 mt-2 text-center">
+                <>
                   <Button
                     variant="contained"
                     color="secondary"
-                    sx={{ color: "#fff" }}
-                    size="small"
+                    sx={{ color: '#fff', fontWeight: 700, borderRadius: 2, px: 3, py: 1 }}
+                    size="medium"
                     onClick={() => {
                       navigate(`/owner/real-estate/update/${slug}`);
                     }}
@@ -155,87 +170,42 @@ const PersonalRealEstateDetail = () => {
                   >
                     <Button
                       variant="contained"
-                      sx={{ color: "#fff" }}
-                      size="small"
+                      sx={{ color: '#fff', fontWeight: 700, borderRadius: 2, px: 3, py: 1, background: 'linear-gradient(90deg, #223981 0%, #3b82f6 100%)' }}
+                      size="medium"
                       startIcon={<GavelIcon />}
                     >
                       Create Contract
                     </Button>
                   </Link>
                   <Button
-                    disabled={
-                      isProcessing || (alertFlag && alertType === "success")
-                    }
+                    disabled={isProcessing || (alertFlag && alertType === 'success')}
                     variant="contained"
                     color="error"
-                    sx={{ color: "#fff" }}
-                    size="small"
+                    sx={{ color: '#fff', fontWeight: 700, borderRadius: 2, px: 3, py: 1 }}
+                    size="medium"
                     onClick={handleModalOpen}
                     startIcon={<DeleteForeverRoundedIcon />}
                   >
                     {isProcessing ? (
-                      <CircularProgress
-                        size={24}
-                        sx={{
-                          color: "#fff",
-                        }}
-                      />
+                      <CircularProgress size={24} sx={{ color: '#fff' }} />
                     ) : (
-                      "Delete Property"
+                      'Delete Property'
                     )}
                   </Button>
-                </div>
+                </>
               ) : (
-                <div className="">
-                  <Link to={`/owner/contract/${realEstate?._id}/${slug}`}>
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      size="small"
-                      sx={{ color: "#fff" }}
-                      startIcon={<ArticleIcon />}
-                    >
-                      View Contract
-                    </Button>
-                  </Link>
-                </div>
+                <Link to={`/owner/contract/${realEstate?._id}/${slug}`}>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    size="medium"
+                    sx={{ color: '#fff', fontWeight: 700, borderRadius: 2, px: 3, py: 1 }}
+                    startIcon={<ArticleIcon />}
+                  >
+                    View Contract
+                  </Button>
+                </Link>
               )}
-            </div>
-          </section>
-          <div className="">
-            <h3 className="font-semibold p-3">Description</h3>
-            <hr className="w-3/4 ml-3 border-t-2 rounded-md" />
-            <p className="text-lg p-3 tracking-normal">
-              {realEstate?.description}
-            </p>
-          </div>
-          <div className="">
-            <h3 className="font-semibold p-3">Overview</h3>
-            <hr className="w-3/4 ml-3 border-t-2 rounded-md" />
-            <div className="flex flex-wrap">
-              <div className="flex p-3 mt-2 gap-2 items-center">
-                <span>
-                  <SquareFootRoundedIcon sx={{ color: "#738FA7" }} />
-                </span>
-                <span className="font-semibold"> Area of Property </span>
-                <p className="">{format(realEstate?.area)} sq. feet</p>
-              </div>
-              <div className="flex p-3 mt-2 gap-2 items-center">
-                <span>
-                  <HorizontalSplitRoundedIcon />
-                </span>
-                <span className="font-semibold">
-                  Number of {realEstate?.floors > 1 ? "floors" : "floor"}
-                </span>
-                <p className="">{format(realEstate?.floors)} </p>
-              </div>
-              <div className="flex p-3 mt-2 gap-2 items-center">
-                <span>
-                  <ExploreRoundedIcon sx={{ color: "#29b46e" }} />
-                </span>
-                <span className="font-semibold"> Property Facing </span>
-                <p className="">{realEstate?.facing}</p>
-              </div>
             </div>
           </div>
         </div>

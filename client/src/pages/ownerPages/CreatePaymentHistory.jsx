@@ -50,8 +50,11 @@ const CreatePaymentHistory = () => {
 
   const paymentMethodOptions = ["Cash", "Cheque", "Bank Transfer", "Online"];
 
+  // Set today's date in YYYY-MM-DD format
+  const todayStr = new Date().toISOString().slice(0, 10);
   const [paymentForm, setPaymentFrom] = useState({
     paymentMethod: "",
+    paymentDate: todayStr
   });
 
   // handle change in the form
@@ -92,10 +95,11 @@ const CreatePaymentHistory = () => {
   const [formData, setFormData] = useState({});
   const handleConfirmation = (e) => {
     e.preventDefault();
-    const { paymentMethod } = paymentForm;
+    const { paymentMethod, paymentDate } = paymentForm;
     const nextDueDate = calculateNextDueDate(rentDetail?.currentRentDate?.to);
     setFormData({
       paymentMethod,
+      paymentDate,
       rentDetail: rentDetailId,
       amountPaid: calculateTotalRent(
         rentDetail?.paymentPlan,
@@ -110,7 +114,6 @@ const CreatePaymentHistory = () => {
         to: calculateAddedDate(rentDetail?.paymentPlan, nextDueDate),
       },
     });
-
     handleModalOpen();
   };
 
@@ -124,129 +127,135 @@ const CreatePaymentHistory = () => {
     return <h1 className="mt-6 text-center">Rent Detail Not Found</h1>;
 
   return (
-    <main className="flex mt-14 flex-row justify-center">
-      <div className="flex flex-col items-center md:ml-14 md:items-start">
-        <div className="mb-6 text-center md:text-start">
-          <h3 className="font-heading font-bold">Payment Detail</h3>
-          <p className="text-gray-400 -mt-2 font-robotoNormal">
-            Fill in the form below to log the payment detail
-          </p>
-          <h4 className="font-robotoNormal mt-2">
-            <HomeWorkRoundedIcon /> {rentDetail?.realEstate.title}
-          </h4>
+    <main className="min-h-screen bg-gradient-to-br from-blue-100 via-indigo-50 to-white py-10 flex flex-col items-center justify-center">
+      <div className="max-w-3xl w-full mx-auto flex flex-col md:flex-row gap-10 items-center justify-center">
+        {/* Payment Illustration (left) */}
+        <div className="hidden md:block flex-1 self-center">
+          <img src={paymentImg} alt="Payment Illustration" className="max-w-xs rounded-2xl shadow-lg" />
         </div>
-
-        <div className="">
-          <form id="form" onSubmit={handleConfirmation}>
-            <div className="flex flex-col gap-4 justify-center md:justify-start mt-4">
-              <div className="mb-3">
-                <h5 className="text-gray-700">
-                  <DateRangeRoundedIcon />{" "}
-                  {dateFormatter(rentDetail?.currentRentDate.from)} -{" "}
-                  {dateFormatter(rentDetail?.currentRentDate.to)}
-                </h5>
-              </div>
-              <div className="flex mb-3 gap-4">
-                <h5 className="text-gray-700">
-                  {countryToCurrency[currentCountry.code]}{" "}
-                  {format(
-                    calculateTotalRent(
-                      rentDetail?.paymentPlan,
-                      rentDetail?.realEstate.price
-                    )
-                  )}
-                </h5>
-                <h5 className="text-gray-700">
-                  {" "}
-                  | {calculateNumberOfMonths(rentDetail?.paymentPlan)}
-                </h5>
-              </div>
-              <div className="mb-4">
-                <h5 className="text-gray-700 mb-3">
-                  <InfoRoundedIcon /> Select Payment Method
-                </h5>
-                <TextField
-                  select
-                  required
-                  label="Payment Method"
-                  value={paymentForm.paymentMethod}
-                  onChange={handleChange}
-                  sx={{ width: "250px" }}
-                  name="paymentMethod"
-                  color="tertiary"
-                >
-                  {paymentMethodOptions?.map((value, index) => (
-                    <MenuItem key={index} value={value} className="">
-                      {value}
-                    </MenuItem>
-                  ))}
-                </TextField>
+        {/* Payment Form Card (right) */}
+        <div className="relative w-full max-w-xl flex flex-col gap-6 group transition-transform duration-300 hover:scale-[1.025]">
+          {/* Accent Bar */}
+          <div className="absolute top-0 left-0 w-full h-2 rounded-t-3xl bg-gradient-to-r from-blue-400 via-indigo-400 to-blue-600 animate-gradient-x" />
+          <div className="bg-gradient-to-br from-white via-blue-50 to-indigo-100 rounded-3xl shadow-2xl border border-indigo-100 p-10 pt-8 flex flex-col gap-8 relative z-10">
+            <div className="mb-2 text-center">
+              <h2 className="font-heading font-extrabold text-3xl text-[#223981] mb-2 tracking-wide drop-shadow-lg">Register Payment</h2>
+              <p className="text-gray-500 font-robotoNormal mb-2 text-base">Fill in the form below to log the payment detail</p>
+              <h4 className="font-robotoNormal mt-2 text-lg text-[#223981] flex items-center justify-center gap-2">
+                <HomeWorkRoundedIcon /> {rentDetail?.realEstate.title}
+              </h4>
+            </div>
+            {/* Payment Summary */}
+            <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-white rounded-xl shadow p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4 border border-indigo-200">
+              <div className="flex flex-col gap-1">
+                <span className="text-blue-900 font-bold flex items-center gap-2 text-lg">
+                  <DateRangeRoundedIcon sx={{ color: '#223981' }} />
+                  {dateFormatter(rentDetail?.currentRentDate.from)} - {dateFormatter(rentDetail?.currentRentDate.to)}
+                </span>
+                <span className="text-indigo-700 font-bold flex items-center gap-2 text-lg">
+                  {countryToCurrency[currentCountry.code]} {format(calculateTotalRent(rentDetail?.paymentPlan, rentDetail?.realEstate.price))}
+                  <span className="text-gray-400 font-normal text-base">/ {calculateNumberOfMonths(rentDetail?.paymentPlan)} month(s)</span>
+                </span>
               </div>
             </div>
-            <div className="text-center mt-4 mb-6">
-              <Button
-                disabled={
-                  isProcessing || (alertFlag && alertType === "success")
-                }
-                type="submit"
-                variant="contained"
-                size="large"
-                color="primary"
-                sx={{
-                  color: "white",
-                  "&:hover": {
-                    backgroundColor: "primary.dark",
-                    opacity: [0.9, 0.8, 0.7],
-                  },
-                }}
-              >
-                {isProcessing ? (
-                  <CircularProgress
-                    size={26}
-                    sx={{
-                      color: "#fff",
-                    }}
+            {/* Payment Form */}
+            <form id="form" onSubmit={handleConfirmation} className="flex flex-col gap-8 mt-2">
+              <div className="flex flex-col gap-6">
+                <div>
+                  <h5 className="text-[#223981] mb-2 flex items-center gap-2 text-base font-semibold">
+                    <InfoRoundedIcon /> Select Payment Method
+                  </h5>
+                  <TextField
+                    select
+                    required
+                    label="Payment Method"
+                    value={paymentForm.paymentMethod}
+                    onChange={handleChange}
+                    sx={{ width: "100%", background: '#f8fafc', borderRadius: 2 }}
+                    name="paymentMethod"
+                    color="primary"
+                  >
+                    {paymentMethodOptions?.map((value, index) => (
+                      <MenuItem key={index} value={value} className="">
+                        {value}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </div>
+                <div>
+                  <h5 className="text-[#223981] mb-2 flex items-center gap-2 text-base font-semibold">
+                    Payment Date
+                  </h5>
+                  <input
+                    type="date"
+                    name="paymentDate"
+                    value={paymentForm.paymentDate}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 rounded border border-indigo-200 bg-[#f8fafc] text-[#223981] focus:outline-none focus:ring-2 focus:ring-blue-300"
+                    required
                   />
-                ) : (
-                  "Save Payment"
-                )}
-              </Button>
-            </div>
-          </form>
+                </div>
+              </div>
+              <div className="flex justify-center mt-2">
+                <Button
+                  disabled={isProcessing || (alertFlag && alertType === "success")}
+                  type="submit"
+                  variant="contained"
+                  size="large"
+                  sx={{
+                    background: 'linear-gradient(90deg, #223981 0%, #3b82f6 100%)',
+                    color: 'white',
+                    fontWeight: 900,
+                    fontSize: '1.2rem',
+                    py: 2,
+                    borderRadius: 3,
+                    boxShadow: 6,
+                    letterSpacing: 2,
+                    textTransform: 'uppercase',
+                    transition: 'all 0.2s',
+                    '&:hover': {
+                      background: 'linear-gradient(90deg, #1a2a5c 0%, #2563eb 100%)',
+                      boxShadow: 12,
+                      transform: 'scale(1.04)',
+                    },
+                  }}
+                >
+                  {isProcessing ? (
+                    <CircularProgress size={28} sx={{ color: "#fff" }} />
+                  ) : (
+                    "Save Payment"
+                  )}
+                </Button>
+              </div>
+            </form>
+          </div>
         </div>
-
-        <div>
-          <ConfirmModal open={open} handleModalClose={handleModalClose}>
-            <h3 className="text-center">Approve Payment</h3>
-            <p className="text-center my-4">
-              Are you sure you want to approve this payment? This action cannot
-              be undone.
-            </p>
-            <div className="flex flex-wrap justify-center gap-8 mt-8">
-              <Button onClick={handleModalClose} color="error">
-                Close
-              </Button>
-
-              <Button
-                onClick={handleCreateRentDetail}
-                color="success"
-                variant="contained"
-              >
-                Confirm
-              </Button>
-            </div>
-          </ConfirmModal>
-        </div>
+        {/* Confirm Modal and Toast */}
+        <ConfirmModal open={open} handleModalClose={handleModalClose}>
+          <h3 className="text-center text-lg font-bold">Approve Payment</h3>
+          <p className="text-center my-4 text-gray-600">
+            Are you sure you want to approve this payment? This action cannot be undone.
+          </p>
+          <div className="flex flex-wrap justify-center gap-8 mt-8">
+            <Button onClick={handleModalClose} color="error">
+              Close
+            </Button>
+            <Button
+              onClick={handleCreateRentDetail}
+              color="success"
+              variant="contained"
+            >
+              Confirm
+            </Button>
+          </div>
+        </ConfirmModal>
+        <AlertToast
+          alertFlag={alertFlag}
+          alertMsg={alertMsg}
+          alertType={alertType}
+          handleClose={handleAlertClose}
+        />
       </div>
-      <div className="hidden pl-4 self-center md:block">
-        <img src={paymentImg} alt="" />
-      </div>
-      <AlertToast
-        alertFlag={alertFlag}
-        alertMsg={alertMsg}
-        alertType={alertType}
-        handleClose={handleAlertClose}
-      />
     </main>
   );
 };

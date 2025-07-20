@@ -19,46 +19,35 @@ const ProfilePageComponent = ({ user, handleSubmit, isProcessing }) => {
         setIsViewerOpen(false);
     };
     return (
-        <main className="flex flex-col gap-10 mt-10 px-12">
-            <div className="flex flex-col gap-2">
-                <h3 className="font-heading font-bold">Profile</h3>
-                <p className="text-gray-400 -mt-3 font-robotoNormal">
-                    View or update profile
-                </p>
-            </div>
-            <div className="flex flex-col gap-10">
-                <div className="flex flex-col md:flex-row items-center gap-6 border p-4">
-                    <div className="w-40 rounded-full overflow-hidden cursor-pointer">
-                        <img
-                            className="h-40 w-full object-cover"
-                            src={user?.profileImage}
-                            alt="profile"
-                            onClick={() => openImageViewer(0)}
-                        />
-                        {/* Open and View the Image */}
-                        {isViewerOpen && (
-                            <ImageViewer
-                                src={[user?.profileImage]}
-                                currentIndex={0}
-                                onClose={closeImageViewer}
-                                disableScroll={false}
-                                backgroundStyle={{
-                                    backgroundColor: "rgba(0,0,0,0.9)",
-                                    zIndex: 9999,
-                                }}
-                                closeOnClickOutside={true}
-
-                            />
-                        )}
-                    </div>
-                    <div>
-
-                        <p className="font-roboto text-2xl font-medium">{user?.firstName} {user?.lastName}</p>
-                        <p className="">{user?.address}, {user?.city}, {user?.country}</p>
-                    </div>
+        <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-white py-12 flex items-center justify-center animate-fadein-scale">
+            <div className="w-full max-w-2xl mx-auto bg-white rounded-3xl shadow-2xl border border-indigo-100 p-8 flex flex-col items-center gap-8 animate-fadein-scale">
+                {/* Profile Picture at the top */}
+                <div className="w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden shadow-xl border-4 border-blue-200 bg-white -mt-20 mb-2">
+                    <img
+                        className="w-full h-full object-cover"
+                        src={user?.profileImage}
+                        alt="profile"
+                        onClick={() => openImageViewer(0)}
+                        style={{ cursor: 'pointer' }}
+                    />
                 </div>
-                <div className="">
-                    <form id="form" onSubmit={handleSubmit}>
+                {isViewerOpen && (
+                    <ImageViewer
+                        src={[user?.profileImage]}
+                        currentIndex={0}
+                        onClose={closeImageViewer}
+                        disableScroll={false}
+                        backgroundStyle={{ backgroundColor: "rgba(0,0,0,0.9)", zIndex: 9999 }}
+                        closeOnClickOutside={true}
+                    />
+                )}
+                <h2 className="text-3xl font-extrabold text-[#223981] text-center drop-shadow-lg animate-fadein-delay">
+                    {user?.firstName} {user?.lastName}
+                </h2>
+                <p className="text-[#475569] text-center text-lg mb-2">{user?.address}, {user?.city}, {user?.country}</p>
+                {/* Profile Form Card below info */}
+                <div className="w-full">
+                    <form id="form" onSubmit={handleSubmit} className="flex flex-col gap-6">
                         <UserProfileComponent {...user} isProcessing={isProcessing} />
                     </form>
                 </div>

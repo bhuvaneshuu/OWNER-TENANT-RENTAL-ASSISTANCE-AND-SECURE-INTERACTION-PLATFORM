@@ -11,7 +11,7 @@ import {
   ImageCarousal,
   PaymentHistoryComponent,
 } from "../../components";
-import { CardActionArea, Avatar, Button } from "@mui/material";
+import { CardActionArea, Avatar, Button, Typography, Divider, Chip } from "@mui/material";
 import {
   dateFormatter,
   calculateNextDueDate,
@@ -27,6 +27,7 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
 import HistoryIcon from "@mui/icons-material/History";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import countryToCurrency from "country-to-currency";
 import { countries } from "../../utils/countryList";
 
@@ -34,9 +35,7 @@ const SingleRentDetail = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { rentDetailId } = useParams();
-
   const ref = useRef(null);
-
   const {
     isLoading,
     rentDetail,
@@ -45,193 +44,288 @@ const SingleRentDetail = () => {
     isProcessing,
     numberOfPages,
   } = useSelector((state) => state.rentDetailOwner);
-
-  // state to store page for payment history
   const [page, setPage] = useState(1);
-
   const currentCountry = countries.find(
     (country) => country.label === rentDetail?.realEstate?.address?.country
   );
   const format = createNumberFormatter(currentCountry?.code);
-
   useEffect(() => {
     dispatch(getSingleRentDetailOwnerView({ rentDetailId }));
   }, [dispatch, rentDetailId]);
-
-  // state to show payment history component
   const [showPaymentHistory, setShowPaymentHistory] = useState(false);
-
-  // function to handle page number change
   const handlePageChange = (event, value) => {
     setPage(value);
     dispatch(getAllPaymentHistory({ page: value, rentDetailId }));
   };
-
-  // function to handle click on show payment history button
   const handleShowPayment = () => {
     dispatch(getAllPaymentHistory({ rentDetailId, page: 1 }));
-    setShowPaymentHistory(true); // show payment history component
+    setShowPaymentHistory(true);
     setPage(1);
-    ref.current.scrollIntoView({ behavior: "smooth" }); // scroll to payment history component on click smoothly
+    ref.current.scrollIntoView({ behavior: "smooth" });
   };
-
   if (isLoading) return <PageLoading />;
   if (!rentDetail)
-    return <h1 className="mt-6 text-center">Rent Detail Not Found</h1>;
-
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <Typography variant="h4" sx={{ color: '#223981', fontWeight: 700, mb: 2 }}>
+            Rent Detail Not Found
+          </Typography>
+          <Button
+            variant="outlined"
+            onClick={() => navigate(-1)}
+            startIcon={<ArrowBackIcon />}
+            sx={{ color: '#223981', borderColor: '#223981' }}
+          >
+            Go Back
+          </Button>
+        </div>
+      </div>
+    );
   return (
     <>
-      <main className="mb-12 mt-10 mx-4 md:mx-12">
-        <h3 className="mb-4 font-heading font-bold">Rent Detail</h3>
-        <section className="flex flex-col gap-12 rounded-md md:flex-row">
-          <div className="w-full md:w-2/3">
-            <ImageCarousal
-              realEstateImages={rentDetail?.realEstate?.realEstateImages}
-            />
+      <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-white py-10">
+        <div className="max-w-6xl mx-auto px-4">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-10">
+            <Button
+              variant="outlined"
+              onClick={() => navigate(-1)}
+              startIcon={<ArrowBackIcon />}
+              sx={{
+                color: '#223981',
+                borderColor: '#223981',
+                '&:hover': { borderColor: '#1a2a5c', backgroundColor: 'rgba(34,57,129,0.04)' },
+                fontWeight: 600,
+                fontSize: '1rem',
+                px: 3,
+                py: 1.2,
+                borderRadius: 2
+              }}
+            >
+              Back to Rent Details
+            </Button>
+            <Typography variant="h3" sx={{ color: '#223981', fontWeight: 800, mb: 0 }}>
+              Rent Detail
+            </Typography>
           </div>
-          <div className="">
-            <div className="flex flex-col gap-2">
-              <Link to={`/owner/real-estate/${rentDetail?.realEstate?.slug}`}>
-                <h3 className="font-semibold hover:text-primaryDark duration-300 ease-in-out cursor-pointer">
-                  {rentDetail?.realEstate?.title}
-                </h3>
-              </Link>
 
-              <p className="-ml-1 text-base tracking-tight">
-                <LocationOnOutlinedIcon sx={{ color: "#019149" }} />
-                {rentDetail?.realEstate?.address?.streetName},{" "}
-                {rentDetail?.realEstate?.address?.city},{" "}
-                {rentDetail?.realEstate?.address?.state},{" "}
-                {rentDetail?.realEstate?.address?.country}
-              </p>
-            </div>
-            <div className="mt-4 text-primaryDark">
-              <p className="font-roboto leading-4 ">Rent per month</p>
-              <span className="font-semibold text-lg">
-                {countryToCurrency[currentCountry.code]} {format(rentDetail?.realEstate?.price)}
-              </span>
-            </div>
-            <div className="mt-4">
-              <p className="font-robotoNormal">
-                <span className="font-medium">Payment Plan:</span>{" "}
-                {rentDetail?.paymentPlan}
-              </p>
-              <p className="font-robotoNormal">
-                <span className="font-medium">Current Rent Date:</span>{" "}
-                {moment(rentDetail?.currentRentDate.from).format("MMM Do")} -{" "}
-                {dateFormatter(rentDetail?.currentRentDate.to)}
-              </p>
-              <p className="font-robotoNormal">
-                <span className="font-medium">Next Rent Due:</span>{" "}
-                {dateFormatter(
-                  calculateNextDueDate(rentDetail?.currentRentDate.to)
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+            {/* Left: Property Image and Register Payment */}
+            <div className="flex flex-col gap-8">
+              <div className="bg-white rounded-3xl shadow-2xl overflow-hidden min-h-[420px] max-h-[600px] min-w-[380px] max-w-[700px] flex items-center justify-center mx-auto">
+                <ImageCarousal realEstateImages={rentDetail?.realEstate?.realEstateImages} />
+              </div>
+              {/* Payment Actions Section (moved left) */}
+              <div className="bg-gradient-to-br from-blue-100 via-indigo-50 to-white rounded-2xl shadow-lg p-6 flex flex-col items-center border border-indigo-100 w-full min-h-[160px] max-w-[520px] mx-auto">
+                <Typography
+                  variant="h6"
+                  sx={{
+                    color: '#223981',
+                    fontWeight: 700,
+                    letterSpacing: 1,
+                    mb: 2,
+                    textTransform: 'uppercase',
+                    fontSize: '1.1rem'
+                  }}
+                >
+                  Payment Actions
+                </Typography>
+                <div className="w-full mb-4">
+                  <hr className="border-t border-indigo-200" />
+                </div>
+                {isRentPaid && (
+                  <div className="w-full mb-4">
+                    <div className="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-3 rounded flex items-center">
+                      <PointOfSaleIcon sx={{ color: '#f59e42', mr: 1, fontSize: 22 }} />
+                      <span style={{ fontSize: '1rem' }}>
+                        Rent is already marked as paid for this period.<br />
+                        Registering another payment will create a duplicate.
+                      </span>
+                    </div>
+                  </div>
                 )}
-              </p>
-              <p className="font-robotoNormal">
-                <span className="font-medium">Rent Status:</span>{" "}
-                {isRentPaid === true ? (
-                  <>
-                    <DoneRoundedIcon color="success" /> Paid
-                  </>
-                ) : (
-                  <>
-                    <CloseRoundedIcon color="error" /> Not Paid
-                  </>
-                )}
-              </p>
-
-              {/*  If rent is not paid then show the button to send email and mark as paid */}
-              {isRentPaid === false && (
-                <div className="flex flex-row gap-8 mt-4">
+                {/* Send Payment Email Button */}
+                <Button
+                  component={Link}
+                  to={`/owner/rentDetail/send-payment-email/${rentDetail?._id}`}
+                  variant="outlined"
+                  fullWidth
+                  startIcon={<MailOutlineIcon sx={{ fontSize: 22 }} />}
+                  sx={{
+                    color: '#223981',
+                    borderColor: '#223981',
+                    mb: 2,
+                    fontWeight: 700,
+                    fontSize: '1.1rem',
+                    borderRadius: 2,
+                    letterSpacing: 1,
+                    textTransform: 'uppercase',
+                    '&:hover': {
+                      borderColor: '#1a2a5c',
+                      backgroundColor: 'rgba(34,57,129,0.04)'
+                    },
+                  }}
+                >
+                  Send Payment Email
+                </Button>
+                <Link
+                  to={`/owner/rentDetail/paymentHistory/${rentDetail?._id}/create`}
+                  style={{ width: '100%', textDecoration: 'none' }}
+                >
                   <Button
                     variant="contained"
-                    color="tertiary"
-                    size="small"
-                    sx={{ color: "#fff" }}
-                    onClick={() =>
-                      navigate(
-                        `/owner/rentDetail/send-payment-email/${rentDetail?._id}`
-                      )
-                    }
-                    startIcon={<MailOutlineIcon />}
+                    fullWidth
+                    startIcon={<PointOfSaleIcon sx={{ fontSize: 22 }} />}
+                    sx={{
+                      background: 'linear-gradient(90deg, #223981 0%, #3b82f6 100%)',
+                      color: 'white',
+                      fontWeight: 700,
+                      fontSize: '1.1rem',
+                      py: 1.7,
+                      borderRadius: 3,
+                      boxShadow: 3,
+                      letterSpacing: 1,
+                      textTransform: 'uppercase',
+                      '&:hover': {
+                        background: 'linear-gradient(90deg, #1a2a5c 0%, #2563eb 100%)',
+                        boxShadow: 6,
+                      },
+                    }}
                   >
-                    Send Email
+                    Register Payment
                   </Button>
-
-                  <Link
-                    to={`/owner/rentDetail/paymentHistory/${rentDetail?._id}/create`}
-                  >
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      size="small"
-                      sx={{ color: "#fff" }}
-                      startIcon={<PointOfSaleIcon />}
-                    >
-                      Register Payment
-                    </Button>
+                </Link>
+              </div>
+            </div>
+            {/* Right: Combined Info/Contact */}
+            <div className="flex flex-col gap-8">
+              {/* Combined Property Info and Tenant Info Card */}
+              <div className="bg-gradient-to-br from-white via-blue-50 to-indigo-50 rounded-3xl shadow-xl p-8 min-h-[380px] max-w-[520px] mx-auto w-full flex flex-col gap-8">
+                {/* Property Info Section */}
+                <div>
+                  <Link to={`/owner/real-estate/${rentDetail?.realEstate?.slug}`}>
+                    <Typography variant="h5" sx={{ color: '#223981', fontWeight: 700, mb: 2, cursor: 'pointer', '&:hover': { color: '#1a2a5c' }, fontSize: '1.5rem' }}>
+                      {rentDetail?.realEstate?.title}
+                    </Typography>
+                  </Link>
+                  <div className="flex items-center gap-2 mb-4">
+                    <LocationOnOutlinedIcon sx={{ color: '#223981', fontSize: 22 }} />
+                    <Typography variant="body2" sx={{ color: '#64748b', fontSize: '1rem' }}>
+                      {rentDetail?.realEstate?.address?.streetName}, {rentDetail?.realEstate?.address?.city}, {rentDetail?.realEstate?.address?.state}, {rentDetail?.realEstate?.address?.country}
+                    </Typography>
+                  </div>
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-4 mb-4">
+                    <Typography variant="body2" sx={{ color: '#64748b', mb: 1, fontSize: '1rem' }}>
+                      Rent per month
+                    </Typography>
+                    <Typography variant="h4" sx={{ color: '#223981', fontWeight: 800, fontSize: '2rem' }}>
+                      {countryToCurrency[currentCountry?.code]} {format(rentDetail?.realEstate?.price)}
+                    </Typography>
+                  </div>
+                  <Divider sx={{ my: 3 }} />
+                  {/* Rent Details */}
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <Typography variant="body2" sx={{ color: '#64748b', fontSize: '1rem' }}>Payment Plan:</Typography>
+                      <Typography variant="body2" sx={{ color: '#223981', fontWeight: 600, fontSize: '1rem' }}>{rentDetail?.paymentPlan}</Typography>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <Typography variant="body2" sx={{ color: '#64748b', fontSize: '1rem' }}>Current Rent Date:</Typography>
+                      <Typography variant="body2" sx={{ color: '#223981', fontWeight: 600, fontSize: '1rem' }}>
+                        {moment(rentDetail?.currentRentDate.from).format("MMM Do")} - {dateFormatter(rentDetail?.currentRentDate.to)}
+                      </Typography>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <Typography variant="body2" sx={{ color: '#64748b', fontSize: '1rem' }}>Next Rent Due:</Typography>
+                      <Typography variant="body2" sx={{ color: '#223981', fontWeight: 600, fontSize: '1rem' }}>
+                        {dateFormatter(calculateNextDueDate(rentDetail?.currentRentDate.to))}
+                      </Typography>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <Typography variant="body2" sx={{ color: '#64748b', fontSize: '1rem' }}>Rent Status:</Typography>
+                      <Chip
+                        icon={isRentPaid ? <DoneRoundedIcon /> : <CloseRoundedIcon />}
+                        label={isRentPaid ? "Paid" : "Unpaid"}
+                        color={isRentPaid ? "success" : "error"}
+                        sx={{ fontWeight: 600, fontSize: '1rem' }}
+                      />
+                    </div>
+                  </div>
+                </div>
+                {/* Tenant Info Section */}
+                <div className="flex flex-col items-center gap-4">
+                  <Link to={`/owner/tenant-user/${rentDetail?.tenant?.slug}`} style={{ textDecoration: 'none', width: '100%' }}>
+                    <CardActionArea sx={{ borderRadius: 3 }}>
+                      <div className="flex flex-col items-center gap-4">
+                        <Avatar
+                          src={rentDetail?.tenant?.profileImage}
+                          alt={(rentDetail?.tenant?.firstName).toUpperCase()}
+                          sx={{ width: 80, height: 80, border: '3px solid #223981', mb: 2 }}
+                        />
+                        <Typography variant="h6" sx={{ color: '#223981', fontWeight: 700, fontSize: '1.2rem' }}>
+                          {rentDetail?.tenant?.firstName} {rentDetail?.tenant?.lastName}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: '#64748b', fontSize: '1rem' }}>
+                          Tenant
+                        </Typography>
+                        <div className="flex items-center gap-2 mt-2">
+                          <LocalPhoneRoundedIcon sx={{ color: '#223981', fontSize: 22 }} />
+                          <Typography variant="body2" sx={{ color: '#64748b', fontSize: '1rem' }}>
+                            {rentDetail?.tenant?.phoneNumber}
+                          </Typography>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <EmailRoundedIcon sx={{ color: '#223981', fontSize: 22 }} />
+                          <Typography variant="body2" sx={{ color: '#64748b', wordBreak: 'break-all', fontSize: '1rem' }}>
+                            {rentDetail?.tenant?.email}
+                          </Typography>
+                        </div>
+                      </div>
+                    </CardActionArea>
                   </Link>
                 </div>
-              )}
-              <div className="mt-6">
-                <Button
-                  onClick={handleShowPayment}
-                  variant="contained"
-                  color="secondary"
-                  size="small"
-                  sx={{ color: "#fff" }}
-                  startIcon={<HistoryIcon />}
-                >
-                  View Payment History
-                </Button>
               </div>
             </div>
           </div>
-        </section>
-        <div className="mt-8">
-          <Link to={`/owner/tenant-user/${rentDetail?.tenant?.slug}`}>
-            <CardActionArea sx={{ borderRadius: "0.375rem" }}>
-              <div className="p-4 shadow-lg rounded-md">
-                <div className="flex gap-2 items-center">
-                  <h4 className="font-medium">Tenant Info</h4>
-                  <ContactsRoundedIcon color="secondary" />
-                </div>
-                <div className="flex mt-4 gap-2 items-center">
-                  <Avatar
-                    src={rentDetail?.tenant?.profileImage}
-                    alt={(rentDetail?.tenant?.firstName).toUpperCase()}
-                  />
-                  <h5 className="leading-4 font-serif">
-                    {rentDetail?.tenant?.firstName}{" "}
-                    {rentDetail?.tenant?.lastName}
-                  </h5>
-                </div>
-                <div className="flex mt-2 ml-1 gap-2 items-center">
-                  <LocalPhoneRoundedIcon sx={{ color: "#6D9886" }} />
-                  <p className="ml-3">{rentDetail?.tenant?.phoneNumber}</p>
-                </div>
-                <div className="flex mt-2 ml-1 gap-2 items-center">
-                  <EmailRoundedIcon sx={{ color: "#E7AB79" }} />
-                  <p className="overflow-auto">{rentDetail?.tenant?.email}</p>
-                </div>
+
+          {/* Payment History Section - full width below */}
+          <div ref={ref} className="mt-12">
+            {showPaymentHistory && (
+              <div className="bg-white rounded-3xl shadow-xl p-8 min-h-[220px] w-full mt-4 max-w-6xl mx-auto">
+                <PaymentHistoryComponent
+                  allPaymentHistory={allPaymentHistory}
+                  isProcessing={isProcessing}
+                  numberOfPages={numberOfPages}
+                  page={page}
+                  handlePageChange={handlePageChange}
+                  currentCountryCode={currentCountry?.code}
+                />
               </div>
-            </CardActionArea>
-          </Link>
-        </div>
-        <div ref={ref}>
-          {showPaymentHistory && (
-            <PaymentHistoryComponent
-              allPaymentHistory={allPaymentHistory}
-              isProcessing={isProcessing}
-              numberOfPages={numberOfPages}
-              page={page}
-              handlePageChange={handlePageChange}
-              currentCountryCode={currentCountry?.code}
-            />
-          )}
+            )}
+            <div className="flex justify-center mt-8">
+              <Button
+                onClick={handleShowPayment}
+                variant="contained"
+                startIcon={<HistoryIcon sx={{ fontSize: 22 }} />}
+                sx={{
+                  backgroundColor: '#64748b',
+                  '&:hover': { backgroundColor: '#475569' },
+                  py: 1.5,
+                  borderRadius: 2,
+                  fontWeight: 700,
+                  fontSize: '1rem',
+                  px: 4,
+                  boxShadow: 2,
+                  minWidth: 180
+                }}
+              >
+                View Payment History
+              </Button>
+            </div>
+          </div>
         </div>
       </main>
-
       <Footer />
     </>
   );

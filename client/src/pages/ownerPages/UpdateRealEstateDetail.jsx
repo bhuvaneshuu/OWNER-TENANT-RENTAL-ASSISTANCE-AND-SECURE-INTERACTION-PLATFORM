@@ -63,42 +63,25 @@ const UpdateRealEstateDetail = () => {
   if (isLoading) return <PageLoading />;
 
   return (
-    <div>
-      <main className="px-6 h-full mt-7">
-        <div className="flex lg:justify-between justify-center flex-wrap h-full g-6">
-          <div className="lg:w-5/12 md:w-8/12 mb-12">
-            <form onSubmit={handleSubmit} id="form">
-              <div className="flex justify-center items-center flex-col mt-3 mb-4">
-                <h3 className="font-heading font-bold">
-                  Update Property Details
-                </h3>
-                <p className="text-gray-400 text-sm">
-                  Enter the updated details of your property
-                </p>
-              </div>
-              <UpdatePropertyForm {...realEstate} isProcessing={isProcessing} />
-            </form>
-          </div>
-          <div className="hidden grow-0 shrink-1 md:shrink-0 basis-auto w-5/12 mb-12 lg:block">
-            <img
-              src={postRealEstateImg}
-              className="w-full"
-              alt="Cartoon of a person holding a card"
-            />
-            <img
-              src={postRealEstateImg2}
-              className="w-full"
-              alt="Cartoon of a person holding a card"
-            />
-            <img
-              src={postRealEstateImg3}
-              className="w-full"
-              alt="Cartoon of a person holding a card"
-            />
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-white py-10 flex flex-col items-center justify-center animate-fadein-scale">
+      <main className="w-full max-w-5xl mx-auto flex flex-col md:flex-row gap-10 items-center justify-center animate-fadein-scale">
+        {/* Illustration Section */}
+        <div className="hidden md:flex flex-col items-center justify-center gap-4 md:w-5/12">
+          <img src={postRealEstateImg} className="w-full max-w-xs rounded-2xl shadow-lg animate-fadein-delay" alt="Cartoon of a person holding a card" />
+          <img src={postRealEstateImg2} className="w-full max-w-xs rounded-2xl shadow-lg animate-fadein-delay" alt="Cartoon of a person holding a card" />
+          <img src={postRealEstateImg3} className="w-full max-w-xs rounded-2xl shadow-lg animate-fadein-delay" alt="Cartoon of a person holding a card" />
+        </div>
+        {/* Update Form Card */}
+        <div className="bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl border border-indigo-100 p-8 flex-1 max-w-xl w-full animate-fadein-scale">
+          <form onSubmit={handleSubmit} id="form" className="flex flex-col gap-6">
+            <div className="flex flex-col items-center gap-2 mb-4">
+              <h3 className="font-heading font-extrabold text-2xl text-[#223981] tracking-wide drop-shadow-lg">Update Property Details</h3>
+              <p className="text-gray-500 text-base font-medium">Enter the updated details of your property</p>
+            </div>
+            <UpdatePropertyForm {...realEstate} isProcessing={isProcessing} />
+          </form>
         </div>
       </main>
-
       <AlertToast
         alertFlag={alertFlag}
         alertMsg={alertMsg}

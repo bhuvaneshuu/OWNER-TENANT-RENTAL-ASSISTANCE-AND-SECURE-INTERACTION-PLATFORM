@@ -70,48 +70,60 @@ const TenantUserDetailPage = () => {
     );
 
   return (
-    <>
-      <main className="flex flex-col mx-auto mb-12 mt-10 md:flex md:ml-10">
-        <h3 className="font-heading font-semibold text-4xl">Profile</h3>
-        <div className="flex flex-col mt-6 gap-4 md:flex-row">
-          <div className="w-48 h-48 md:w-96 md:h-96 cursor-pointer">
+    <div className="min-h-[120vh] flex flex-col">
+      {/* Hero Banner with blurred background */}
+      <div className="relative w-full h-[160px] md:h-[220px] overflow-hidden">
+        <img
+          src={user?.profileImage}
+          alt="profile-bg"
+          className="absolute inset-0 w-full h-full object-cover scale-110 blur-md brightness-75"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-transparent" />
+      </div>
+      {/* Floating Profile Card */}
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center -mt-32 md:-mt-40 mb-12 animate-fadein-scale">
+        <div className="w-full max-w-xl mx-auto bg-white/80 backdrop-blur-md rounded-3xl shadow-2xl border border-indigo-100 p-8 flex flex-col items-center gap-6 animate-fadein-scale">
+          {/* Profile Image */}
+          <div className="w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden shadow-xl border-4 border-blue-200 -mt-24 md:-mt-32 bg-white">
             <img
               src={user?.profileImage}
               alt="profile"
-              className="rounded-md w-full h-full object-cover"
+              className="w-full h-full object-cover"
               onClick={() => openImageViewer(0)}
+              style={{ cursor: 'pointer' }}
             />
-            {/* Open and View the Image */}
-            {isViewerOpen && (
-              <ImageViewer
-                src={[user?.profileImage]}
-                currentIndex={0}
-                onClose={closeImageViewer}
-                disableScroll={false}
-                backgroundStyle={{
-                  backgroundColor: "rgba(0,0,0,0.9)",
-                }}
-                closeOnClickOutside={true}
-              />
-            )}
           </div>
-          <div className="md:ml-4 flex flex-col gap-3">
-            <p className="text-2xl font-robotoNormal">
-              {user?.firstName} {user?.lastName}
-            </p>
-
+          {isViewerOpen && (
+            <ImageViewer
+              src={[user?.profileImage]}
+              currentIndex={0}
+              onClose={closeImageViewer}
+              disableScroll={false}
+              backgroundStyle={{ backgroundColor: "rgba(0,0,0,0.9)" }}
+              closeOnClickOutside={true}
+            />
+          )}
+          {/* Name and Info */}
+          <h2 className="text-3xl font-extrabold text-[#223981] text-center drop-shadow-lg animate-fadein-delay flex items-center gap-2">
+            <ContactPageRoundedIcon sx={{ color: '#223981', fontSize: 32 }} />
+            {user?.firstName} {user?.lastName}
+          </h2>
+          <div className="flex flex-col gap-2 items-center text-[#475569] animate-fadein-delay">
             <div className="flex gap-2 items-center">
               <LocationOnOutlinedIcon sx={{ color: "#019149" }} />
-              <p>{user?.address}</p>
+              <span>{user?.address}</span>
             </div>
             <div className="flex gap-2 items-center">
               <LocalPhoneRoundedIcon sx={{ color: "#6D9886" }} />
-              <p className="ml-3">+977 {user?.phoneNumber}</p>
+              <span>+977 {user?.phoneNumber}</span>
             </div>
             <div className="flex gap-2 items-center">
               <EmailRoundedIcon sx={{ color: "#E7AB79" }} />
-              <p className="">{user?.email}</p>
+              <span>{user?.email}</span>
             </div>
+          </div>
+          {/* Action Buttons Row */}
+          <div className="flex flex-wrap gap-4 mt-4 w-full justify-center animate-fadein-delay">
             {isContact ? (
               <Button
                 disabled={isProcessing}
@@ -119,18 +131,19 @@ const TenantUserDetailPage = () => {
                 variant="contained"
                 color="error"
                 startIcon={<PersonRemoveAlt1RoundedIcon />}
-                size="small"
+                size="large"
                 sx={{
                   color: "white",
+                  fontWeight: 700,
+                  borderRadius: 2,
+                  px: 3,
+                  py: 1,
+                  letterSpacing: 1,
+                  minWidth: 120,
                 }}
               >
                 {isProcessing ? (
-                  <CircularProgress
-                    size={26}
-                    sx={{
-                      color: "#fff",
-                    }}
-                  />
+                  <CircularProgress size={26} sx={{ color: "#fff" }} />
                 ) : (
                   "Remove"
                 )}
@@ -142,47 +155,54 @@ const TenantUserDetailPage = () => {
                 variant="contained"
                 color="secondary"
                 startIcon={<ContactPageRoundedIcon />}
-                  size="small"
+                size="large"
                 sx={{
                   color: "white",
+                  fontWeight: 700,
+                  borderRadius: 2,
+                  px: 3,
+                  py: 1,
+                  letterSpacing: 1,
+                  minWidth: 120,
                 }}
               >
                 {isProcessing ? (
-                  <CircularProgress
-                    size={26}
-                    sx={{
-                      color: "#fff",
-                    }}
-                  />
+                  <CircularProgress size={26} sx={{ color: "#fff" }} />
                 ) : (
                   "Add"
                 )}
               </Button>
             )}
-
-            <div className="flex">
-              <Button
-                variant="contained"
-                size="small"
-                sx={{
-                  color: "white",
-                  width: "100%",
-                }}
-                startIcon={<MessageIcon />}
-                onClick={async () => {
-                  try {
-                    // 1. Create or get chat
-                    const { data } = await axiosFetch.post("/chat", { userId: user._id });
-                    // 2. Navigate to chat page with chat object (no initial message)
-                    navigate(`/owner/chat`, { state: data });
-                  } catch (err) {
-                    alert("Failed to start chat");
-                  }
-                }}
-              >
-                Chat
-              </Button>
-            </div>
+            <Button
+              variant="contained"
+              size="large"
+              sx={{
+                color: "white",
+                fontWeight: 700,
+                borderRadius: 2,
+                px: 3,
+                py: 1,
+                letterSpacing: 1,
+                minWidth: 120,
+                background: 'linear-gradient(90deg, #223981 0%, #3b82f6 100%)',
+                '&:hover': {
+                  background: 'linear-gradient(90deg, #1a2a5c 0%, #2563eb 100%)',
+                },
+              }}
+              startIcon={<MessageIcon />}
+              onClick={async () => {
+                try {
+                  // 1. Create or get chat
+                  const { data } = await axiosFetch.post("/chat", { userId: user._id });
+                  // 2. Navigate to chat page with chat object (no initial message)
+                  navigate(`/owner/chat`, { state: data });
+                } catch (err) {
+                  alert("Failed to start chat");
+                }
+              }}
+            >
+              Chat
+            </Button>
           </div>
         </div>
         <AlertToast
@@ -193,7 +213,7 @@ const TenantUserDetailPage = () => {
         />
       </main>
       <Footer />
-    </>
+    </div>
   );
 };
 
