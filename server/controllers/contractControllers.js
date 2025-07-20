@@ -45,7 +45,10 @@ const createContract = async (req, res) => {
     throw new NotFoundError("Real estate not found");
   }
 
-  const contract = await Contract.create(req.body);
+  const contract = await Contract.create({
+    ...req.body,
+    status: "Pending",
+  });
 
   const to = tenantUser.email;
   const from = ownerUser.email;

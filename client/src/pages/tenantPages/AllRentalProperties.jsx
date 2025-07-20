@@ -45,12 +45,14 @@ const AllRentalProperties = () => {
     );
   return (
     <>
-      <main className="flex flex-col mb-12 mt-8 md:items-start md:ml-10">
-        <h3 className="my-4 font-heading font-bold text-center">
-          Your Rental{" "}
-          {allRentalProperties?.length > 1 ? "Properties" : "Property"}
+      <main
+        className="flex flex-col items-center min-h-screen mb-12 mt-8 px-2"
+        style={{ background: '#f5faff' }}
+      >
+        <h3 className="my-6 font-heading font-bold text-center text-2xl text-[#102a43]">
+          Your Rental {allRentalProperties?.length > 1 ? "Properties" : "Property"}
         </h3>
-        <div className="flex flex-wrap gap-8 justify-center mx-4 md:justify-start md:mx-0">
+        <div className="flex flex-wrap gap-8 justify-center w-full max-w-7xl">
           {allRentalProperties?.map((item) => {
             const {
               title,
@@ -68,51 +70,56 @@ const AllRentalProperties = () => {
             return (
               <Card
                 sx={{
-                  width: 345,
-
-                  bgcolor: "transparent",
-                  boxShadow: "none",
-                  "&:hover": {
-                    boxShadow: "0 2px 5px 0 rgba(0,0,0,0.2)",
+                  width: 360,
+                  bgcolor: "#fff",
+                  borderRadius: 3,
+                  boxShadow: "0 2px 12px 0 rgba(0,0,0,0.07)",
+                  transition: "box-shadow 0.2s, transform 0.2s",
+                  '&:hover': {
+                    boxShadow: "0 6px 24px 0 rgba(0,0,0,0.13)",
+                    transform: 'translateY(-4px) scale(1.02)',
                   },
                   color: "#102a43",
+                  display: 'flex',
+                  flexDirection: 'column',
+                  minHeight: 420,
                 }}
                 key={item._id}
               >
-                <Link to={`/tenant/rental-properties/${slug}`}>
-                  <CardActionArea>
+                <Link to={`/tenant/rental-properties/${slug}`} style={{ textDecoration: 'none' }}>
+                  <CardActionArea sx={{ borderRadius: 3 }}>
                     <CardMedia
                       component="img"
-                      sx={{ maxHeight: 150 }}
+                      sx={{ height: 200, borderTopLeftRadius: 12, borderTopRightRadius: 12, objectFit: 'cover' }}
                       image={realEstateImages[0]}
                       alt={title}
                     />
-                    <CardContent>
+                    <CardContent sx={{ pb: 1 }}>
                       <h4
-                        className="mb-1 overflow-hidden overflow-ellipsis whitespace-nowrap hover:text-primaryDark duration-300 ease-in-out"
+                        className="mb-1 overflow-hidden overflow-ellipsis whitespace-nowrap hover:text-[#1976d2] duration-300 ease-in-out text-lg font-semibold"
                         style={{ maxWidth: "31ch" }}
                       >
                         {title}
                       </h4>
-                      <p className="text-sm text-gray-400">{category}</p>
-                      <p className="font-semibold">
-                        {countryToCurrency[currentCountry.code]} <span className="">{format(price)}</span> / month
+                      <p className="text-sm text-gray-400 mb-1">{category}</p>
+                      <p className="font-semibold text-base mb-1">
+                        {countryToCurrency[currentCountry.code]} <span>{format(price)}</span> <span className="text-xs text-gray-500">/ month</span>
                       </p>
-                      <p className="text-base">
-                        <LocationOnOutlinedIcon color="secondary" />
+                      <p className="text-base flex items-center gap-1 text-gray-600">
+                        <LocationOnOutlinedIcon color="secondary" fontSize="small" />
                         {address?.streetName}, {address?.city}
                       </p>
                     </CardContent>
                   </CardActionArea>
                 </Link>
-                <div className="flex p-2">
-                  <div className="flex items-center gap-1">
+                <div className="flex p-3 pt-2 items-center mt-auto border-t border-gray-100">
+                  <div className="flex items-center gap-2">
                     <Avatar
                       src={propertyOwner?.profileImage}
                       alt={propertyOwner?.firstName}
-                      sx={{ width: 36, height: 36 }}
+                      sx={{ width: 38, height: 38 }}
                     />
-                    <span className="font-semibold text-xs text-gray-600">
+                    <span className="font-semibold text-xs text-gray-700">
                       {propertyOwner?.firstName} {propertyOwner?.lastName}
                     </span>
                   </div>
@@ -122,10 +129,19 @@ const AllRentalProperties = () => {
                   >
                     <Button
                       size="small"
-                      color="tertiary"
                       variant="outlined"
                       sx={{
-                        color: "#0496b4",
+                        color: "#1976d2",
+                        borderColor: "#1976d2",
+                        borderRadius: 2,
+                        fontWeight: 600,
+                        px: 2,
+                        textTransform: 'none',
+                        '&:hover': {
+                          background: '#e3f2fd',
+                          borderColor: '#115293',
+                          color: '#115293',
+                        },
                       }}
                     >
                       Owner Details

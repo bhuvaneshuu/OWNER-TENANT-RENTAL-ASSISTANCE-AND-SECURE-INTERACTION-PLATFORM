@@ -71,49 +71,59 @@ const TenantChat = () => {
   }
   if (chats?.length === 0) {
     return (
-      <div className="mt-12">
-        <h3 className="font-robotoNormal text-center">
-          No chat available. Add a contact to start chatting.
-        </h3>
+      <div className="flex justify-center items-center min-h-screen bg-[#f4f7fa]">
+        <div className="w-full max-w-5xl bg-white rounded-2xl shadow-2xl p-8">
+          <div className="bg-[#223981] rounded-t-2xl px-8 py-4">
+            <h3 className="font-heading font-bold text-white text-2xl">Chat</h3>
+          </div>
+          <div className="flex flex-col items-center justify-center h-96">
+            <h3 className="font-robotoNormal text-gray-400 text-xl text-center">
+              No chat available. Add a contact to start chatting.
+            </h3>
+          </div>
+        </div>
       </div>
     );
   }
   return (
-    <div className="flex flex-col flex-wrap justify-center gap-8 md:justify-start mt-12 mb-8 px-6 md:mx-4">
-      <h3 className="font-heading font-bold">Chat</h3>
-      <div
-        className="flex gap-4"
-        style={{
-          maxHeight: "500px",
-        }}
-      >
-        <div className="flex flex-col gap-4 w-1/3 overflow-y-auto overflow-x-hidden">
-          {chats?.map((chat) => (
-            <div key={chat?._id} onClick={() => handleCurrentChatChange(chat)}>
+    <div className="flex justify-center items-center min-h-screen bg-[#f4f7fa]">
+      <div className="w-full max-w-5xl bg-white rounded-2xl shadow-2xl p-0">
+        <div className="bg-[#223981] rounded-t-2xl px-8 py-4">
+          <h3 className="font-heading font-bold text-white text-2xl">Chat</h3>
+        </div>
+        <div className="flex flex-row gap-0 p-6" style={{ minHeight: 500 }}>
+          {/* Chat List */}
+          <div className="bg-[#f7f9fc] rounded-xl shadow-sm p-4 w-1/3 min-w-[220px] max-w-xs flex flex-col gap-3 h-[420px] overflow-y-auto border border-[#e3e8f0]">
+            {chats?.map((chat) => (
               <div
-                className={`${
-                  currentSelectedChatIndex === chat?._id && "bg-slate-300"
-                } rounded-md`}
+                key={chat?._id}
+                onClick={() => handleCurrentChatChange(chat)}
+                className={`cursor-pointer transition-all duration-150 ${
+                  currentSelectedChatIndex === chat?._id
+                    ? "bg-[#e3e8f0] border border-[#bfc8e0]"
+                    : "bg-white border border-[#e3e8f0] hover:bg-[#f0f4fa]"
+                } rounded-lg px-3 py-2 flex items-center`}
               >
                 <ChatUsers chat={chat} currentUser={user} />
               </div>
-            </div>
-          ))}
-        </div>
-        {currentChat === null ? (
-          <div className="flex justify-center items-center h-64 w-full">
-            <p className="font-display text-base md:text-xl lg:text-2xl text-center">
-              Click on a chat to start messaging
-            </p>
+            ))}
           </div>
-        ) : (
-          <ChatMessages
-            chat={currentChat}
-              currentUser={user}
-              fromTenant
-              handleCurrentChatChange={handleCurrentChatChange}
-            />
-        )}
+          {/* Chat Messages or Empty State */}
+          <div className="flex-1 flex items-center justify-center bg-[#f7f9fc] rounded-xl ml-6 h-[420px]">
+            {currentChat === null ? (
+              <p className="font-display text-2xl text-gray-400 text-center">
+                Click on a chat to start messaging
+              </p>
+            ) : (
+              <ChatMessages
+                chat={currentChat}
+                currentUser={user}
+                fromTenant
+                handleCurrentChatChange={handleCurrentChatChange}
+              />
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

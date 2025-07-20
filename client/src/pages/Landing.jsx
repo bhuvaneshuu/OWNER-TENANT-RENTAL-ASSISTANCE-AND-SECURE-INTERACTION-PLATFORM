@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Logo, AlertToast, Footer } from "../components";
 import landingImg from "../assets/images/landing1.svg";
 import landingImg2 from "../assets/images/landing2.svg";
@@ -270,6 +270,14 @@ const Landing = () => {
           <span className="text-blue-900 font-extrabold text-lg tracking-tight">Owner-Tenant System</span>
           <span className="text-blue-800 font-medium text-sm mt-1">Effortless property handling for owners & tenants</span>
           <span className="text-gray-500 text-xs mt-2">&copy; {new Date().getFullYear()} Owner-Tenant System. All rights reserved.</span>
+          <div className="w-full flex justify-center mb-6">
+          <Link
+            to="/privacy"
+            className="text-sm text-[#1976d2] underline hover:text-[#115293] transition-colors duration-200"
+          >
+            Privacy Policy
+          </Link>
+        </div>
         </div>
       </footer>
       <AlertToast

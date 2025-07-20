@@ -4,7 +4,7 @@ import { useParams, Link } from "react-router-dom";
 import { getSingleRealEstate } from "../../features/realEstateTenant/realEstateTenantSlice";
 import { PageLoading, Footer, ImageCarousal } from "../../components";
 import { format, dateFormatter, createNumberFormatter } from "../../utils/valueFormatter";
-import { CardActionArea, Avatar, Button } from "@mui/material";
+import { CardActionArea, Avatar, Button, Paper, Box, Stack, Divider } from "@mui/material";
 import EmailRoundedIcon from "@mui/icons-material/EmailRounded";
 import LocalPhoneRoundedIcon from "@mui/icons-material/LocalPhoneRounded";
 import ContactsRoundedIcon from "@mui/icons-material/ContactsRounded";
@@ -22,11 +22,8 @@ const RentalPropertyDetail = () => {
   const { realEstate, isLoading } = useSelector(
     (state) => state.realEstateTenant
   );
-
   const dispatch = useDispatch();
-
   const { slug } = useParams();
-
   const currentCountry = countries.find(
     (country) => country.label === realEstate?.address?.country
   );
@@ -37,163 +34,171 @@ const RentalPropertyDetail = () => {
   }, [slug, dispatch]);
 
   if (isLoading) return <PageLoading />;
-
   if (!realEstate)
     return <h1 className="mt-6 text-center">No real estate found</h1>;
 
   return (
     <>
-      <main className="mb-12 mt-10 mx-4 md:mx-12">
-        <div className="flex flex-col gap-4 mx-auto">
-          <h3 className="font-heading font-bold">Rental Property Detail</h3>
-          <section className="flex flex-col gap-12 rounded-md md:flex-row">
-            <div className="w-full md:w-2/3">
-              <ImageCarousal realEstateImages={realEstate?.realEstateImages} />
-            </div>
-            <div className="flex flex-col rounded-md gap-4">
-              <div className="flex flex-col gap-2">
-                <h3 className="font-semibold">{realEstate?.title}</h3>
-                <div>
-                  <p className="font-roboto text-gray-500">
-                    {realEstate?.category}
-                  </p>
-                </div>
-                <p className="-ml-1 text-base tracking-tight">
-                  <LocationOnOutlinedIcon sx={{ color: "#019149" }} />
-                  {realEstate?.address?.streetName}, {" "}
-                  {realEstate?.address?.city},{" "}
-                  {realEstate?.address?.state}, {" "}
-                  {realEstate?.address?.country}
-                </p>
-                <div className="">
-                  <p className="font-robotoNormal text-xs font-semibold tracking-tight">
-                    Posted on: {dateFormatter(realEstate?.createdAt)}
-                  </p>
-                  <p className="font-robotoNormal text-xs tracking-tight">
-                    Id: {realEstate?.propertyId}
-                  </p>
-                </div>
-              </div>
-              <div className="">
-                <div className="rounded-md">
-                  <p className="font-roboto text-primaryDark leading-4 ">
-                    RENT per month
-                  </p>
-                  <span className="font-semibold text-lg text-primaryDark">
-                    {countryToCurrency[currentCountry.code]} {format(realEstate?.price)}
-                  </span>
-                </div>
-              </div>
-              <div className="flex flex-wrap gap-6">
-                <Link to={`/tenant/contract/${realEstate?._id}/${slug}`}>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    size="small"
-                    sx={{ color: "#fff" }}
-                    startIcon={<ArticleIcon />}
-                  >
-                    View Contract
-                  </Button>
-                </Link>
-                <Link
-                  to={`/tenant/rentDetail/${realEstate?._id + "/" + slug}`}
-                  state={{ realEstateId: realEstate?._id }}
-                >
-                  <Button
-                    variant="contained"
-                    color="tertiary"
-                    size="small"
-                    sx={{ color: "#fff" }}
-                    startIcon={<MapsHomeWorkIcon />}
-                  >
-                    Rent Detail
-                  </Button>
-                </Link>
-                <Link to={`/tenant/send-complaint/${slug}`}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    size="small"
-                    sx={{ color: "#fff" }}
-                    startIcon={<MailIcon />}
-                  >
-                    Send Complaint
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </section>
-          <article className="mt-2">
-            <Link to={`/tenant/owner-user/${realEstate?.propertyOwner?.slug}`}>
-              <CardActionArea sx={{ borderRadius: "6px" }}>
-                <div className="shadow-lg rounded-md p-4">
-                  <div className="flex gap-2 items-center">
-                    <h4 className="font-medium">Contact Info</h4>
-                    <ContactsRoundedIcon color="secondary" />
-                  </div>
-                  <div className="flex mt-4 gap-2 items-center">
-                    <Avatar
-                      src={realEstate?.propertyOwner?.profileImage}
-                      alt={(realEstate?.propertyOwner?.firstName).toUpperCase()}
-                    />
-                    <p className="leading-4">
-                      {realEstate?.propertyOwner?.firstName}{" "}
-                      {realEstate?.propertyOwner?.lastName}
-                    </p>
-                  </div>
-                  <div className="flex mt-2 ml-1 gap-2 items-center">
-                    <LocalPhoneRoundedIcon sx={{ color: "#6D9886" }} />
-                    <p className="ml-3">
-                      {realEstate?.propertyOwner?.phoneNumber}
-                    </p>
-                  </div>
-                  <div className="flex mt-2 ml-1 gap-2 items-center">
-                    <EmailRoundedIcon sx={{ color: "#E7AB79" }} />
-                    <p className="overflow-auto">
-                      {realEstate?.propertyOwner?.email}
-                    </p>
-                  </div>
-                </div>
-              </CardActionArea>
-            </Link>
-          </article>
-          <div className="">
-            <h3 className="font-semibold p-3">Description</h3>
-            <hr className="w-3/4 ml-3 border-t-2 rounded-md" />
-            <p className="text-lg p-3 tracking-normal">
-              {realEstate?.description}
-            </p>
+      <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-white pb-10">
+        {/* Full-width Hero Image with overlay */}
+        <div className="relative w-full">
+          <div className="h-[340px] md:h-[440px] w-full overflow-hidden">
+            <div className="absolute inset-0 z-10 bg-gradient-to-b from-black/60 via-black/30 to-transparent" />
+            <ImageCarousal realEstateImages={realEstate?.realEstateImages} />
           </div>
-          <div className="">
-            <h3 className="font-semibold p-3">Overview</h3>
-            <hr className="w-3/4 ml-3 border-t-2 rounded-md" />
-            <div className="flex flex-wrap">
-              <div className="flex p-3 mt-2 gap-2 items-center">
-                <span>
-                  <SquareFootRoundedIcon sx={{ color: "#738FA7" }} />
+          {/* Overlayed Title, Price, Address */}
+          <div className="absolute top-0 left-0 w-full h-full flex flex-col items-center justify-center z-20 pointer-events-none">
+            <h1 className="text-white text-3xl md:text-5xl font-extrabold drop-shadow-lg mb-2 animate-fadein-delay">{realEstate?.title}</h1>
+            <div className="flex items-center gap-2 mb-2 animate-fadein-delay">
+              <LocationOnOutlinedIcon sx={{ color: '#fff', fontSize: 28 }} />
+              <span className="text-white text-lg md:text-2xl font-semibold drop-shadow">{realEstate?.address?.streetName}, {realEstate?.address?.city}, {realEstate?.address?.state}, {realEstate?.address?.country}</span>
+            </div>
+            <span className="text-white text-2xl md:text-4xl font-bold bg-black/40 px-6 py-2 rounded-2xl shadow-lg animate-shadow-pulse">
+              {countryToCurrency[currentCountry.code]} {format(realEstate?.price)}
+            </span>
+          </div>
+        </div>
+        {/* Main Info Card: category, posted date, stats, description, and actions */}
+        <div className="max-w-5xl mx-auto mt-12">
+          <div className="bg-white rounded-3xl shadow-xl p-8 flex flex-col gap-6 animate-fadein-scale">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="flex flex-col gap-1">
+                <span className="text-indigo-700 font-bold text-lg flex items-center gap-2">
+                  <ExploreRoundedIcon sx={{ color: '#29b46e' }} /> {realEstate?.category}
                 </span>
-                <span className="font-semibold"> Area of Property </span>
-                <p className="">{format(realEstate?.area)} sq. feet</p>
+                <span className="text-gray-500 text-sm">Posted on: {dateFormatter(realEstate?.createdAt)}</span>
+                <span className="text-gray-400 text-xs">Id: {realEstate?.propertyId}</span>
               </div>
-              <div className="flex p-3 mt-2 gap-2 items-center">
-                <span>
+              <div className="flex flex-wrap gap-6 mt-2 md:mt-0">
+                <div className="flex items-center gap-2">
+                  <SquareFootRoundedIcon sx={{ color: '#738FA7' }} />
+                  <span className="font-semibold text-[#223981]">{format(realEstate?.area)} sq. feet</span>
+                </div>
+                <div className="flex items-center gap-2">
                   <HorizontalSplitRoundedIcon />
-                </span>
-                <span className="font-semibold">
-                  Number of {realEstate?.floors > 1 ? "floors" : "floor"}
-                </span>
-                <p className="">{format(realEstate?.floors)} </p>
-              </div>
-              <div className="flex p-3 mt-2 gap-2 items-center">
-                <span>
-                  <ExploreRoundedIcon sx={{ color: "#29b46e" }} />
-                </span>
-                <span className="font-semibold"> Property Facing </span>
-                <p className="">{realEstate?.facing}</p>
+                  <span className="font-semibold text-[#223981]">{format(realEstate?.floors)} {realEstate?.floors > 1 ? 'floors' : 'floor'}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <ExploreRoundedIcon sx={{ color: '#29b46e' }} />
+                  <span className="font-semibold text-[#223981]">{realEstate?.facing}</span>
+                </div>
               </div>
             </div>
+            {/* Description */}
+            <div className="flex items-start gap-4 mt-2">
+              <ArticleIcon sx={{ color: '#223981', fontSize: 32 }} />
+              <div>
+                <h3 className="font-semibold text-xl text-[#223981] mb-2">Description</h3>
+                <p className="text-lg text-[#475569] tracking-normal">
+                  {realEstate?.description}
+                </p>
+              </div>
+            </div>
+            {/* Action Buttons at the bottom of the card */}
+            <div className="flex flex-wrap gap-4 mt-6 items-center justify-center">
+              <Link to={`/tenant/contract/${realEstate?._id}/${slug}`} style={{ textDecoration: 'none' }}>
+                <Button
+                  variant="contained"
+                  sx={{
+                    background: "#f9a825", // Orange
+                    color: "#fff",
+                    fontWeight: 700,
+                    borderRadius: 2,
+                    px: 4,
+                    py: 1.5,
+                    fontSize: "1rem",
+                    textTransform: "uppercase",
+                    letterSpacing: 1,
+                    boxShadow: "none",
+                    '&:hover': {
+                      background: "#c17900",
+                      boxShadow: "none",
+                    },
+                  }}
+                  size="medium"
+                  startIcon={<ArticleIcon />}
+                >
+                  View Contract
+                </Button>
+              </Link>
+              <Link to={`/tenant/rentDetail/${realEstate?._id + "/" + slug}`} state={{ realEstateId: realEstate._id }} style={{ textDecoration: 'none' }}>
+                <Button
+                  variant="contained"
+                  sx={{
+                    background: "#1565c0", // Blue
+                    color: "#fff",
+                    fontWeight: 700,
+                    borderRadius: 2,
+                    px: 4,
+                    py: 1.5,
+                    fontSize: "1rem",
+                    textTransform: "uppercase",
+                    letterSpacing: 1,
+                    boxShadow: "none",
+                    '&:hover': {
+                      background: "#003c8f",
+                      boxShadow: "none",
+                    },
+                  }}
+                  size="medium"
+                  startIcon={<MapsHomeWorkIcon />}
+                >
+                  Rent Detail
+                </Button>
+              </Link>
+              <Link to={`/tenant/send-complaint/${slug}`} style={{ textDecoration: 'none' }}>
+                <Button
+                  variant="contained"
+                  sx={{
+                    background: "#d32f2f", // Red
+                    color: "#fff",
+                    fontWeight: 700,
+                    borderRadius: 2,
+                    px: 4,
+                    py: 1.5,
+                    fontSize: "1rem",
+                    textTransform: "uppercase",
+                    letterSpacing: 1,
+                    boxShadow: "none",
+                    '&:hover': {
+                      background: "#9a0007",
+                      boxShadow: "none",
+                    },
+                  }}
+                  size="medium"
+                  startIcon={<MailIcon />}
+                >
+                  Send Complaint
+                </Button>
+              </Link>
+            </div>
           </div>
+        </div>
+        <div className="max-w-5xl mx-auto mt-8">
+          <Link to={`/tenant/owner-user/${realEstate?.propertyOwner?.slug}`} style={{ textDecoration: 'none' }}>
+            <CardActionArea sx={{ borderRadius: 2, maxWidth: 400, mx: 'auto', boxShadow: 2 }}>
+              <Box className="p-4" bgcolor="#fff" borderRadius={2}>
+                <Stack direction="row" alignItems="center" gap={1} mb={2}>
+                  <h4 className="font-medium text-lg">Contact Info</h4>
+                  <ContactsRoundedIcon color="secondary" />
+                </Stack>
+                <Stack direction="row" alignItems="center" gap={2} mb={1}>
+                  <Avatar src={realEstate?.propertyOwner?.profileImage} alt={(realEstate?.propertyOwner?.firstName).toUpperCase()} />
+                  <p className="leading-4 font-semibold text-base">
+                    {realEstate?.propertyOwner?.firstName} {realEstate?.propertyOwner?.lastName}
+                  </p>
+                </Stack>
+                <Stack direction="row" alignItems="center" gap={1} mb={1}>
+                  <LocalPhoneRoundedIcon sx={{ color: "#6D9886" }} />
+                  <span className="ml-2 text-gray-700">{realEstate?.propertyOwner?.phoneNumber}</span>
+                </Stack>
+                <Stack direction="row" alignItems="center" gap={1}>
+                  <EmailRoundedIcon sx={{ color: "#E7AB79" }} />
+                  <span className="overflow-auto text-gray-700">{realEstate?.propertyOwner?.email}</span>
+                </Stack>
+              </Box>
+            </CardActionArea>
+          </Link>
         </div>
       </main>
       <Footer />

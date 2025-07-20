@@ -104,89 +104,103 @@ const SendComplaint = () => {
     );
 
   return (
-    <main className="mt-10 mb-12 mx-8 md:mx-12">
-      <div className="flex gap-2 mb-4">
-        <h4 className="font-heading font-bold">Send Email Complaint</h4>
-        <ForwardToInboxRoundedIcon color="tertiary" />
-      </div>
-      <div className="shadow-lg rounded-md p-8 overflow-auto">
-        <form onSubmit={handleSendConfirmation}>
-          <div className="flex mt-4 gap-2 items-center">
-            <span className="font-semibold"> To: </span>
-            <p className="">{realEstate?.propertyOwner?.email}</p>
-          </div>
-          <div className="flex mt-2 gap-2 items-center">
-            <span className="font-semibold"> From: </span>
-            <p className="">{user?.email}</p>
-          </div>
-          <div className="flex mt-2 gap-2 items-center">
-            <span className="font-semibold"> Subject: </span>
-            <div className="w-full">
-              <TextField
-                required
-                multiline
-                variant="standard"
-                rows={1}
-                color="tertiary"
-                placeholder="Write your subject here"
-                name="subject"
-                value={formValues.subject}
-                onChange={handleChange}
-                sx={{ width: "100%" }}
-              />
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-white flex flex-col items-center py-10 px-2">
+      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl p-0">
+        <div className="bg-[#223981] rounded-t-2xl px-8 py-5 flex items-center gap-3">
+          <ForwardToInboxRoundedIcon sx={{ color: '#fff', fontSize: 32 }} />
+          <h4 className="font-heading font-bold text-white text-2xl">Send Email Complaint</h4>
+        </div>
+        <div className="px-8 py-8">
+          <form onSubmit={handleSendConfirmation}>
+            <div className="flex mt-4 gap-2 items-center">
+              <span className="font-semibold"> To: </span>
+              <p className="text-gray-700">{realEstate?.propertyOwner?.email}</p>
             </div>
-          </div>
-          <div className="flex mt-2 gap-2 items-start">
-            <span className="font-semibold"> Body: </span>
-            <div className="text-sm mt-1 w-full">
-              <p>
-                Dear {realEstate?.propertyOwner?.firstName}{" "}
-                {realEstate?.propertyOwner?.lastName},
-              </p>
-              <br />
-              <div>
+            <div className="flex mt-2 gap-2 items-center">
+              <span className="font-semibold"> From: </span>
+              <p className="text-gray-700">{user?.email}</p>
+            </div>
+            <div className="flex mt-2 gap-2 items-center">
+              <span className="font-semibold"> Subject: </span>
+              <div className="w-full">
                 <TextField
                   required
                   multiline
                   variant="standard"
-                  rows={8}
+                  rows={1}
                   color="tertiary"
-                  placeholder="Write your message here"
-                  name="message"
-                  value={formValues.message}
+                  placeholder="Write your subject here"
+                  name="subject"
+                  value={formValues.subject}
                   onChange={handleChange}
-                  sx={{ width: "100%" }}
+                  sx={{ width: "100%", fontSize: '1.1rem', background: '#f4f7fa', borderRadius: 2, px: 2 }}
                 />
               </div>
-              <p>Best regards,</p>
-              <p>
-                {user?.firstName} {user?.lastName}
-              </p>
             </div>
-          </div>
-          <div className="flex mt-2 gap-2 justify-end py-2">
-            <Button
-              disabled={isProcessing || (alertFlag && alertType === "success")}
-              type="submit"
-              variant="contained"
-              color="tertiary"
-              sx={{ color: "#fff" }}
-              startIcon={<SendRoundedIcon />}
-            >
-              {isProcessing ? (
-                <CircularProgress
-                  size={26}
-                  sx={{
-                    color: "#fff",
-                    width: "25%",
-                  }}
-                />
-              ) : (
-                "Send Email"
-              )}
-            </Button>
-          </div>
-        </form>
+            <div className="flex mt-2 gap-2 items-start">
+              <span className="font-semibold"> Body: </span>
+              <div className="text-sm mt-1 w-full">
+                <p className="mb-2 text-gray-700">
+                  Dear {realEstate?.propertyOwner?.firstName} {realEstate?.propertyOwner?.lastName},
+                </p>
+                <div>
+                  <TextField
+                    required
+                    multiline
+                    variant="standard"
+                    rows={8}
+                    color="tertiary"
+                    placeholder="Write your message here"
+                    name="message"
+                    value={formValues.message}
+                    onChange={handleChange}
+                    sx={{ width: "100%", fontSize: '1.1rem', background: '#f4f7fa', borderRadius: 2, px: 2 }}
+                  />
+                </div>
+                <p className="mt-2 text-gray-700">Best regards,</p>
+                <p className="text-gray-700">
+                  {user?.firstName} {user?.lastName}
+                </p>
+              </div>
+            </div>
+            <div className="flex mt-6 gap-2 justify-end py-2">
+              <Button
+                disabled={isProcessing || (alertFlag && alertType === "success")}
+                type="submit"
+                variant="contained"
+                sx={{
+                  background: "#1976d2",
+                  color: "#fff",
+                  fontWeight: 700,
+                  borderRadius: 2,
+                  px: 4,
+                  py: 1.5,
+                  fontSize: "1rem",
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
+                  boxShadow: "none",
+                  '&:hover': {
+                    background: "#115293",
+                    boxShadow: "none",
+                  },
+                }}
+                startIcon={<SendRoundedIcon />}
+              >
+                {isProcessing ? (
+                  <CircularProgress
+                    size={26}
+                    sx={{
+                      color: "#fff",
+                      width: "25%",
+                    }}
+                  />
+                ) : (
+                  "Send Email"
+                )}
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
       <ConfirmModal open={open} handleModalClose={handleModalClose}>
         <h3 className="text-center">Send Complaint Email</h3>

@@ -25,17 +25,16 @@ const SavedRealEstate = () => {
 
   return (
     <>
-      <main className="flex flex-col mb-12 mt-8 md:items-start md:ml-10">
-        <h3 className="my-4 font-heading font-bold text-center">
+      <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-white pb-10 mb-12 mt-8">
+        <h3 className="my-10 font-heading font-extrabold text-3xl text-left text-[#223981] drop-shadow-lg ml-10">
           Saved Properties
         </h3>
-        <div className="justify-center flex flex-wrap gap-8 mx-4 md:justify-start md:mx-0">
+        <div className="w-full max-w-7xl bg-white rounded-3xl shadow-xl p-8 flex flex-wrap gap-8 justify-start animate-fadein-scale mx-auto">
           {allRealEstate?.map((item) => {
             return <RealEstateCard key={item._id} {...item} />;
           })}
         </div>
       </main>
-
       <Footer />
     </>
   );
