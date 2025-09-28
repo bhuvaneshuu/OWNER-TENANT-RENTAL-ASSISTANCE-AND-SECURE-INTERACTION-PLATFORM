@@ -46,8 +46,10 @@ if (process.env.NODE_ENV !== "production") {
 //static folder for frontend build files in production mode only (to serve frontend files)
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-//set static folder for frontend build files
-app.use(express.static(path.resolve(__dirname, "../client/dist")));
+//set static folder for frontend build files (only in production)
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.resolve(__dirname, "../client/dist")));
+}
 
 app.use(express.json()); //to parse json data
 app.use(helmet({ contentSecurityPolicy: false })); //secure headers
@@ -91,10 +93,11 @@ app.use("/api/rentDetailTenant", authorizeTenantUser, tenantRentDetailRoutes);
 app.use("/api/chat", chatRoutes);
 
 //serve frontend files in production mode only
-
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "../client/dist", "index.html"));
-});
+if (process.env.NODE_ENV === "production") {
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "../client/dist", "index.html"));
+  });
+}
 
 app.use(errorHandlerMiddleware);
 app.use(routeNotFoundMiddleware);
