@@ -101,23 +101,10 @@ const login = async (req, res) => {
  * @returns {string} token
  */
 const register = async (req, res) => {
+
   const { role, email } = req.body;
-  
+  // console.log(req.body)
   if (role === "owner") {
-    // Create owner without token generation
-    const owner = await OwnerUser.create(req.body);
-
-    // Auto-verify the account
-    owner.accountStatus = true;
-    owner.accountVerificationToken = "";
-    
-    // Handle profile image upload
-    const profileImage = await cloudinaryProfileImageUpload(req);
-    owner.profileImage = profileImage;
-    await owner.save();
-
-    // Commented out email sending for now
-    /*
     //generate token
     const verificationToken = jwt.sign(
       { email: email },
@@ -126,6 +113,16 @@ const register = async (req, res) => {
         expiresIn: "1d",
       }
     );
+
+    // add token to req.body
+    req.body.accountVerificationToken = verificationToken;
+
+    // create owner
+    const owner = await OwnerUser.create(req.body);
+
+    // remove password and token from response object
+    // owner.password = undefined;
+    // owner.accountVerificationToken = undefined;
 
     // send email with token link
     const to = email;
@@ -139,30 +136,15 @@ const register = async (req, res) => {
     <p>Team Property Plus</p>
     `;
     await sendEmail(to, from, subject, body);
-    */
 
-    res.status(201).json({ 
-      success: true, 
-      userType: "owner", 
-      email: owner.email,
-      message: "Registration successful - account verified automatically"
-    });
-    
+    const profileImage = await cloudinaryProfileImageUpload(req)
+    owner.profileImage = profileImage;
+    await owner.save();
+
+    res
+      .status(201)
+      .json({ success: true, userType: "owner", email: owner.email });
   } else if (role === "tenant") {
-    // Create tenant without token generation
-    const tenant = await TenantUser.create(req.body);
-
-    // Auto-verify the account
-    tenant.accountStatus = true;
-    tenant.accountVerificationToken = "";
-    
-    // Handle profile image upload
-    const profileImage = await cloudinaryProfileImageUpload(req);
-    tenant.profileImage = profileImage;
-    await tenant.save();
-
-    // Commented out email sending for now
-    /*
     //generate token
     const verificationToken = jwt.sign(
       { email: email },
@@ -171,6 +153,15 @@ const register = async (req, res) => {
         expiresIn: "1d",
       }
     );
+
+    // add token to req.body
+    req.body.accountVerificationToken = verificationToken;
+
+    const tenant = await TenantUser.create(req.body); // create tenant
+
+    // remove password and token from response object
+    // tenant.password = undefined;
+    // tenant.accountVerificationToken = undefined;
 
     // send email with token link
     const to = email;
@@ -184,15 +175,14 @@ const register = async (req, res) => {
     <p>Team Property Plus</p>
     `;
     await sendEmail(to, from, subject, body);
-    */
 
-    res.status(201).json({ 
-      success: true, 
-      userType: "tenant", 
-      email: tenant.email,
-      message: "Registration successful - account verified automatically"
-    });
-    
+    const profileImage = await cloudinaryProfileImageUpload(req)
+    tenant.profileImage = profileImage;
+    await tenant.save();
+
+    res
+      .status(201)
+      .json({ success: true, userType: "tenant", email: tenant.email });
   } else {
     throw new BadRequestError("Invalid Role");
   }
